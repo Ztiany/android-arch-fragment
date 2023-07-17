@@ -122,7 +122,7 @@ fun <D> ListLayoutHost<D>.handleListData(
 
     if (isLoadMoreEnable) {
         if (hasMore == null) {
-            loadMoreCompleted(list != null && getPager().hasMore(list.size))
+            loadMoreCompleted(list != null && pager.hasMore(list.size))
         } else {
             loadMoreCompleted(hasMore())
         }
