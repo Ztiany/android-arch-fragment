@@ -1,0 +1,71 @@
+plugins {
+    id "com.android.library"
+    id "kotlin-android"
+    id "kotlin-kapt"
+}
+
+android {
+    compileSdkVersion AppConfig.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion AppConfig.minSdkVersion
+        targetSdkVersion AppConfig.targetSdkVersion
+        versionCode AppConfig.versionCode
+        versionName AppConfig.versionName
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
+    //如果不想生成某个布局的绑定类，可以在根视图添加 tools:viewBindingIgnore="true" 属性。
+    buildFeatures {
+        viewBinding true
+    }
+
+}
+
+dependencies {
+    //  基础库
+    api project(':base:core')
+    api project(':base:activity')
+    api project(':base:adapter')
+    api project(':base:viewbinding')
+    api project(':base:mvi')
+    api ThirdLibraries.archDelegate
+    api ThirdLibraries.uiState
+
+    //AndroidX
+    api AndroidLibraries.annotations
+    api AndroidLibraries.activityKtx
+    api AndroidLibraries.fragmentKtx
+    api AndroidLibraries.appcompat
+    api AndroidLibraries.recyclerView
+    api AndroidLibraries.constraintLayout
+    api AndroidLibraries.swiperefreshlayout
+    api AndroidLibraries.material
+    api AndroidLibraries.viewpager2
+
+    //Kotlin
+    api KotlinLibraries.kotlinStdlib
+    api KotlinLibraries.kotlinReflect
+    api KotlinLibraries.kotlinCoroutines
+    api KotlinLibraries.kotlinAndroidCoroutines
+
+    //Log
+    api ThirdLibraries.timber
+
+    //epoxy
+    api UILibraries.epoxy
+    kapt UILibraries.epoxyApt
+}
