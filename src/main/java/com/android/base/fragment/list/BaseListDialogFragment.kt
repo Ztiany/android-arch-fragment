@@ -27,7 +27,6 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
     override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
-        super.internalOnSetUpCreatedView(view, savedInstanceState)
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
     }
 
@@ -78,12 +77,9 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
         }
     }
 
-    protected open fun onRefresh() = onStartLoad()
+    protected open fun onRefresh() {}
 
-    protected open fun onLoadMore() = onStartLoad()
-
-    /**called by [onRefresh] or [onLoadMore], you can get current loading type from [isRefreshing] or [isLoadingMore].*/
-    protected open fun onStartLoad() {}
+    protected open fun onLoadMore() {}
 
     override fun replaceData(data: List<T>) = listLayoutHostImpl.replaceData(data)
 
@@ -113,8 +109,8 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
         return listLayoutHostImpl.isRefreshing()
     }
 
-    override val pager: Paging
-        get() = listLayoutHostImpl.pager
+    override val paging: Paging
+        get() = listLayoutHostImpl.paging
     
     val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")

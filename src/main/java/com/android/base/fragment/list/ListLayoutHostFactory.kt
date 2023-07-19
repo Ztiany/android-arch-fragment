@@ -5,7 +5,6 @@ import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.OnRetryActionListener
-import com.android.base.fragment.ui.PagerSize
 import com.android.base.fragment.ui.RefreshView
 import com.android.base.fragment.ui.RefreshViewFactory
 import com.android.base.fragment.ui.StateLayout
@@ -65,11 +64,9 @@ fun <T> buildListLayoutHost(
 
     return object : ListLayoutHost<T> {
 
-        override val pager = AutoPaging(this, object : PagerSize {
-            override fun getSize(): Int {
-                return listDataHost.getListSize()
-            }
-        })
+        override val paging = AutoPaging {
+            listDataHost.getListSize()
+        }
 
         override fun replaceData(data: List<T>) {
             listDataHost.replaceData(data)

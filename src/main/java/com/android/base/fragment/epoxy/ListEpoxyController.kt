@@ -5,6 +5,7 @@ import com.airbnb.epoxy.TypedEpoxyController
 import com.android.base.app.AndroidSword
 import com.android.base.fragment.ui.ListDataHost
 import com.ztiany.loadmore.adapter.LoadMoreController
+import timber.log.Timber
 
 abstract class ListEpoxyController<T> : TypedEpoxyController<List<T>>(), ListDataHost<T> {
 
@@ -30,6 +31,7 @@ abstract class ListEpoxyController<T> : TypedEpoxyController<List<T>>(), ListDat
     }
 
     override fun addData(data: List<T>) {
+        Timber.e("You should not call this method, use replaceData instead.")
         val currentData: MutableList<T> = currentData?.toMutableList() ?: mutableListOf()
         currentData.removeAll(data)
         currentData.addAll(data)

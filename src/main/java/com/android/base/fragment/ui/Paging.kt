@@ -1,60 +1,27 @@
 package com.android.base.fragment.ui
 
-import timber.log.Timber
 
 /**
  * @author Ztiany
  */
 abstract class Paging @JvmOverloads constructor(
-    var pageStart: Int = defaultPageStart,
-    var pageSize: Int = defaultPageSize,
+    val start: Int = defaultPagingStart,
+    val size: Int = defaultPagingSize,
 ) {
 
-    var pageToken: Any? = null
-
     fun hasMore(size: Int): Boolean {
-        return size >= pageSize
+        return size >= this.size
     }
 
-    /**
-     * 根据 page size 计算当前的页码。
-     */
-    fun calcPageNumber(dataSize: Int): Int {
-        var pageNumber: Int
-        val pageSize = pageSize
-        when (pageStart) {
-            0 -> {
-                pageNumber = dataSize / pageSize - 1
-                Timber.d("pageStart=0, dataSize=%d, pageSize=%d, nextPageNumber=%d", dataSize, pageSize, pageNumber)
-            }
+    abstract val total: Int
 
-            1 -> {
-                pageNumber = dataSize / pageSize
-                pageNumber += 1
-                Timber.d("pageStart=1, dataSize=%d, pageSize=%d, nextPageNumber=%d", dataSize, pageSize, pageNumber)
-            }
+    abstract val current: Int
 
-            else -> {
-                throw RuntimeException("pageStart must be 0 or 1")
-            }
-        }
-        return pageNumber
-    }
-
-    fun setPaging(pageStart: Int, pageSize: Int) {
-        this.pageStart = pageStart
-        this.pageSize = pageSize
-    }
-
-    abstract val currentPage: Int
-
-    abstract val loadingPage: Int
-
-    abstract val itemCount: Int
+    abstract val next: Int
 
     companion object {
-        var defaultPageStart = 0
-        var defaultPageSize = 20
+        var defaultPagingStart = 0
+        var defaultPagingSize = 20
     }
 
 }

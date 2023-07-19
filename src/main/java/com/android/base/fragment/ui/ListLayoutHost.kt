@@ -19,7 +19,7 @@ interface ListDataHost<T> {
  */
 interface ListLayoutHost<T> : StateLayoutHost, ListDataHost<T> {
 
-    val pager: Paging
+    val paging: Paging
 
     fun loadMoreCompleted(hasMore: Boolean)
 
@@ -31,10 +31,6 @@ interface ListLayoutHost<T> : StateLayoutHost, ListDataHost<T> {
 
     var isLoadMoreEnable: Boolean
 
-}
-
-fun ListLayoutHost<*>.isLoadingFirstPage(): Boolean {
-    return isRefreshing() || !isLoadingMore()
 }
 
 fun <T> DataManager<T>.toListDataHost(): ListDataHost<T> {

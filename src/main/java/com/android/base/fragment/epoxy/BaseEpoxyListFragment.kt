@@ -2,7 +2,6 @@ package com.android.base.fragment.epoxy
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.list.buildListLayoutHost
@@ -21,13 +20,8 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
 
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
-    @CallSuper
-    final override fun onSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
-        onSetUpCreatedView2(view, savedInstanceState)
-    }
-
-    protected open fun onSetUpCreatedView2(view: View, savedInstanceState: Bundle?) {
     }
 
     /**
@@ -107,8 +101,8 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
         return listLayoutHostImpl.isRefreshing()
     }
 
-    override val pager: Paging
-        get() = listLayoutHostImpl.pager
+    override val paging: Paging
+        get() = listLayoutHostImpl.paging
 
     val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")

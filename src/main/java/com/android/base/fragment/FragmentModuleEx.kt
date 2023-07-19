@@ -16,19 +16,19 @@ import com.ztiany.loadmore.adapter.LoadMoreConfig
 /** 列表分页起始页。 */
 var AndroidSword.defaultPageStart: Int
     set(value) {
-        Paging.defaultPageStart = value
+        Paging.defaultPagingStart = value
     }
     get() {
-        return Paging.defaultPageStart
+        return Paging.defaultPagingStart
     }
 
 /** 列表分页大小。 */
 var AndroidSword.defaultPageSize: Int
     set(value) {
-        Paging.defaultPageSize = value
+        Paging.defaultPagingSize = value
     }
     get() {
-        return Paging.defaultPageSize
+        return Paging.defaultPagingSize
     }
 
 /** 设置一个默认的布局 id，在使用 Fragments 中相关方法时，如果没有传入特定的容器 id  时，则使用设置的默认布局 id。【必须配置】  */

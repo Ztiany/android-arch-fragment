@@ -2,7 +2,6 @@ package com.android.base.fragment.list
 
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.ui.CommonId
@@ -24,13 +23,8 @@ abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Li
 
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
-    @CallSuper
-    final override fun onSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
-        onSetUpCreatedView2(view, savedInstanceState)
-    }
-
-    protected open fun onSetUpCreatedView2(view: View, savedInstanceState: Bundle?) {
     }
 
     /**
@@ -65,12 +59,9 @@ abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Li
         }
     }
 
-    protected open fun onRefresh() = onStartLoad()
+    protected open fun onRefresh() {}
 
-    protected open fun onLoadMore() = onStartLoad()
-
-    /** called by [onRefresh] or [onLoadMore], you can get current loading type from [isRefreshing] or [isLoadingMore]. */
-    protected open fun onStartLoad() {}
+    protected open fun onLoadMore() {}
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -109,8 +100,8 @@ abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Li
         return listLayoutHostImpl.isRefreshing()
     }
 
-    override val pager: Paging
-        get() = listLayoutHostImpl.pager
+    override val paging: Paging
+        get() = listLayoutHostImpl.paging
 
     override fun loadMoreCompleted(hasMore: Boolean) =
         listLayoutHostImpl.loadMoreCompleted(hasMore)

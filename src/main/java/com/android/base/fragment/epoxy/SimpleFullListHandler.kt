@@ -169,14 +169,8 @@ fun <T> ListState<T>.toRefreshError(refreshError: Throwable): ListState<T> {
     return copy(isRefreshing = false, refreshError = refreshError)
 }
 
-fun <T> ListState<T>.replaceList(list: List<T>): ListState<T> {
-    return copy(data = list, isRefreshing = false, isLoadingMore = false, hasMore = list.size >= AndroidSword.defaultPageSize)
-}
-
-fun <T> ListState<T>.appendList(list: List<T>): ListState<T> {
-    val oldList = data.toMutableList()
-    oldList.addAll(list)
-    return copy(data = oldList, isLoadingMore = false, hasMore = list.size >= AndroidSword.defaultPageSize)
+fun <T> ListState<T>.replaceList(list: List<T>, hasMore: Boolean): ListState<T> {
+    return copy(data = list, isRefreshing = false, isLoadingMore = false, hasMore = hasMore)
 }
 
 fun <T> ListState<T>.appendList(list: List<T>, hasMore: Boolean): ListState<T> {

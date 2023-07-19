@@ -43,17 +43,26 @@ import kotlin.properties.Delegates
  *
  *    class XXXListFragment : BaseListFragment<PayRecord, XXXLayoutBinding>() {
  *
- *          override fun onStartLoad() {
+ *          override fun onRefresh() {
+ *                loadList(paging.start)
+ *           }
+ *
+ *          override fun onLoadMore() {
+ *                loadList(paging.next)
+ *           }
+ *
+ *          fun loadList(loadingPage: Int) {
  *                  lifecycleScope.launch {
  *                      try {
  *                         handleListLoading()
- *                         val payRecords = viewModel.loadListData(getPager().loadingPage, getPager().pageSize)
+ *                         val payRecords = viewModel.loadListData(loadingPage, paging.size)
  *                         handleListResult(payRecords)
  *                      } catch (e: XXXException) {
  *                         handleListError(e)
  *                      }
  *                  }
  *           }
+ *
  *    }
  * ```
  *
@@ -71,7 +80,6 @@ abstract class BaseListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Lis
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
     override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
-        super.internalOnSetUpCreatedView(view, savedInstanceState)
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
     }
 
@@ -122,12 +130,9 @@ abstract class BaseListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Lis
         }
     }
 
-    protected open fun onRefresh() = onStartLoad()
+    protected open fun onRefresh() {}
 
-    protected open fun onLoadMore() = onStartLoad()
-
-    /**called by [onRefresh] or [onLoadMore], you can get current loading type from [isRefreshing] or [isLoadingMore].*/
-    protected open fun onStartLoad() {}
+    protected open fun onLoadMore() {}
 
     override fun replaceData(data: List<T>) = listLayoutHostImpl.replaceData(data)
 
@@ -157,8 +162,8 @@ abstract class BaseListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Lis
         return listLayoutHostImpl.isRefreshing()
     }
 
-    override val pager: Paging
-        get() = listLayoutHostImpl.pager
+    override val paging: Paging
+        get() = listLayoutHostImpl.paging
 
     val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")
