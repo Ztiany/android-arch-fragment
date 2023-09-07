@@ -19,6 +19,14 @@ abstract class Paging @JvmOverloads constructor(
 
     abstract val next: Int
 
+    fun getLoadingPage(firstPage: Boolean): Int {
+        return if (firstPage) {
+            current
+        } else {
+            next
+        }
+    }
+
     companion object {
         var defaultPagingStart = 0
         var defaultPagingSize = 20

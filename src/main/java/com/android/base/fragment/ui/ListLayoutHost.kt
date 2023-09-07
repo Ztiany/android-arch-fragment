@@ -52,3 +52,7 @@ fun <T> DataManager<T>.toListDataHost(): ListDataHost<T> {
         }
     }
 }
+
+fun <T> ListLayoutHost<T>.getLoadingPage(): Int {
+    return paging.getLoadingPage(isRefreshing() || !isLoadingMore())
+}
