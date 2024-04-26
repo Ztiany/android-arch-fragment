@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.android.base.fragment.R
+import com.ztiany.loadmore.adapter.R as LoadMoreR
 
 
 internal var internalDefaultEpoxyLoadMoreViewFactory: EpoxyLoadMoreViewFactory = DefaultEpoxyLoadMoreViewFactory()
@@ -22,14 +22,14 @@ internal class DefaultEpoxyLoadMoreViewFactory : EpoxyLoadMoreViewFactory {
             ).toInt()
         )
 
-        View.inflate(context, R.layout.base_layout_loading_more_row, container)
+        View.inflate(context, com.android.base.fragment.R.layout.base_layout_loading_more_row, container)
 
-        val msgTv = container.findViewById<TextView>(R.id.base_id_loading_more_item_tv)
-        val progressBar = container.findViewById<ProgressBar>(R.id.base_id_loading_more_item_pb)
+        val msgTv = container.findViewById<TextView>(com.android.base.fragment.R.id.base_id_loading_more_item_tv)
+        val progressBar = container.findViewById<ProgressBar>(com.android.base.fragment.R.id.base_id_loading_more_item_pb)
 
-        val noMoreMsg = context.getString(R.string.adapter_no_more_message)
-        val failMsg = context.getString(R.string.adapter_load_more_fail)
-        val clickLoadMsg = context.getString(R.string.adapter_click_load_more)
+        val noMoreMsg = context.getString(LoadMoreR.string.adapter_no_more_message)
+        val failMsg = context.getString(LoadMoreR.string.adapter_load_more_fail)
+        val clickLoadMsg = context.getString(LoadMoreR.string.adapter_click_load_more)
 
         return object : EpoxyLoadMoreView {
 
