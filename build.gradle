@@ -1,7 +1,7 @@
 plugins {
-    id "com.android.library"
-    id "kotlin-android"
-    id "kotlin-kapt"
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.kapt)
 }
 
 android {
@@ -43,30 +43,30 @@ dependencies {
     api project(':base:adapter')
     api project(':base:viewbinding')
     api project(':base:mvi')
-    api ThirdLibraries.archDelegate
-    api ThirdLibraries.uiState
+    api libs.ztiany.archdelegate
+    api libs.ztiany.uistate
 
     //AndroidX
-    api AndroidLibraries.annotations
-    api AndroidLibraries.activityKtx
-    api AndroidLibraries.fragmentKtx
-    api AndroidLibraries.appcompat
-    api AndroidLibraries.recyclerView
-    api AndroidLibraries.constraintLayout
-    api AndroidLibraries.swiperefreshlayout
-    api AndroidLibraries.material
-    api AndroidLibraries.viewpager2
+    api libs.androidx.annotations
+    api libs.androidx.activity.ktx
+    api libs.androidx.fragment.ktx
+    api libs.androidx.appcompat
+    api libs.androidx.recyclerview
+    api libs.androidx.constraintlayout
+    api libs.androidx.swiperefreshlayout
+    api libs.google.ui.material
+    api libs.androidx.viewpager2
 
     //Kotlin
-    api KotlinLibraries.kotlinStdlib
-    api KotlinLibraries.kotlinReflect
-    api KotlinLibraries.kotlinCoroutines
-    api KotlinLibraries.kotlinAndroidCoroutines
+    api libs.kotlin.stdlib
+    api libs.kotlin.reflect
+    api libs.kotlinx.coroutines
+    api libs.kotlinx.coroutines.android
 
     //Log
-    api ThirdLibraries.timber
+    api libs.jakewharton.timber
 
     //epoxy
-    api UILibraries.epoxy
-    kapt UILibraries.epoxyApt
+    api libs.airbnb.epoxy
+    kapt libs.airbnb.epoxy.apt
 }
