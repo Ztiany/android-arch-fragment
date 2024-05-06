@@ -1,6 +1,6 @@
 package com.android.base.fragment.list
 
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.ui.ListLayoutHost
 
 /** @see BaseListFragment */

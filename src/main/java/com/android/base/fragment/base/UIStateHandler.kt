@@ -5,7 +5,7 @@ package com.android.base.fragment.base
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.android.base.activity.collectFlowRepeatedlyOnLifecycle
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.foundation.state.*
 import com.android.base.fragment.tool.collectFlowRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.LoadingViewHost

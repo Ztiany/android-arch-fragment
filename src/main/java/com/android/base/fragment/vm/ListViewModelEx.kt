@@ -48,4 +48,3 @@ fun ViewModel.startListJob(
     val job = viewModelScope.launch(context, start, block)
     refreshTask.setJob(key, job)
 }
-

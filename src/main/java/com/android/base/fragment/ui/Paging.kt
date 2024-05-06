@@ -4,10 +4,13 @@ package com.android.base.fragment.ui
 /**
  * @author Ztiany
  */
-abstract class Paging @JvmOverloads constructor(
-    val start: Int = defaultPagingStart,
-    val size: Int = defaultPagingSize,
-) {
+abstract class Paging {
+
+    /** Load a list from the start position. */
+    abstract val start: Int
+
+    /** the size of each page. */
+    abstract val size: Int
 
     fun hasMore(size: Int): Boolean {
         return size >= this.size

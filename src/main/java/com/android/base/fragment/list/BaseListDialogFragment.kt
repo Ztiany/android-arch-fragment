@@ -5,7 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.viewbinding.ViewBinding
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost

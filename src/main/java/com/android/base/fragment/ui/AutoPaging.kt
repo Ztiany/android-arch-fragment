@@ -2,24 +2,27 @@ package com.android.base.fragment.ui
 
 import timber.log.Timber
 
-typealias PageSize = () -> Int
+/** Used to provide a pager's total item count. */
+typealias TotalSize = () -> Int
 
 /**
  * @author Ztiany
  */
 class AutoPaging(
-    /** callback for providing list total size. */
-    private val pageSizeGetter: PageSize,
+    override val size: Int = defaultPagingSize,
+    override val start: Int = defaultPagingStart,
+    /** callback for providing the list's total size. */
+    private val totalSize: TotalSize,
 ) : Paging() {
 
     override val current: Int
-        get() = calculatePageNumber(pageSizeGetter(), size, start)
+        get() = calculatePageNumber(totalSize(), size, start)
 
     override val next: Int
         get() = current + 1
 
     override val total: Int
-        get() = pageSizeGetter()
+        get() = totalSize()
 
     /**
      * 根据 page size 计算当前的页码。

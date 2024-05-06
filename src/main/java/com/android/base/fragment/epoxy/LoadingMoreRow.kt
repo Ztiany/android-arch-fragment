@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.epoxyLoadMoreViewFactory
 
 @ModelView(autoLayout = ModelView.Size.MANUAL)

@@ -2,7 +2,7 @@ package com.android.base.fragment.epoxy
 
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.TypedEpoxyController
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.ui.ListDataHost
 import com.ztiany.loadmore.adapter.LoadMoreController
 import timber.log.Timber

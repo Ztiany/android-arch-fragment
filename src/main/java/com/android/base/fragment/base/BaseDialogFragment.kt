@@ -12,7 +12,7 @@ import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.android.base.activity.OnBackPressListener
 import com.android.base.activity.fragmentHandleBackPress
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.tool.dismissDialog
 import com.android.base.fragment.ui.LoadingViewHost
 import com.android.base.delegate.State

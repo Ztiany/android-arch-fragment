@@ -2,16 +2,20 @@ package com.android.base.fragment.epoxy
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.android.base.app.AndroidSword
 import com.android.base.arch.mvi.UIState
-import com.android.base.fragment.defaultPageSize
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
+import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListLayoutHost
+import com.android.base.fragment.ui.Paging
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/** A class used to model the state of a list. */
 data class ListState<T>(
     /** 列表数据 */
     val data: List<T> = emptyList(),
@@ -25,6 +29,83 @@ data class ListState<T>(
     val loadMoreError: Throwable? = null,
     val hasMore: Boolean = false,
 ) : UIState
+
+fun <T> ListState<T>.toRefreshing(): ListState<T> {
+    return copy(isRefreshing = true, refreshError = null, isLoadingMore = false, loadMoreError = null)
+}
+
+fun <T> ListState<T>.toLoadingMore(): ListState<T> {
+    return copy(isRefreshing = false, refreshError = null, isLoadingMore = true, loadMoreError = null)
+}
+
+fun <T> ListState<T>.toRefreshError(refreshError: Throwable): ListState<T> {
+    return copy(isRefreshing = false, refreshError = refreshError)
+}
+
+fun <T> ListState<T>.toLoadMoreError(loadMoreError: Throwable): ListState<T> {
+    return copy(isLoadingMore = false, loadMoreError = loadMoreError)
+}
+
+fun <T> ListState<T>.replaceList(list: List<T>, hasMore: Boolean): ListState<T> {
+    return copy(data = list, isRefreshing = false, isLoadingMore = false, hasMore = hasMore)
+}
+
+fun <T> ListState<T>.appendList(list: List<T>, hasMore: Boolean): ListState<T> {
+    val oldList = data.toMutableList()
+    oldList.addAll(list)
+    return copy(data = oldList, isLoadingMore = false, hasMore = hasMore)
+}
+
+/** A class used to multiple the state of a list. */
+class ListStateHelper<T>(
+    val state: MutableStateFlow<ListState<T>> = MutableStateFlow(ListState()),
+    listSize: (List<T>) -> Int = { it.size },
+    val paging: Paging = AutoPaging {
+        listSize(state.value.data)
+    },
+) {
+
+    fun updateToRefreshing() {
+        state.update {
+            it.toRefreshing()
+        }
+    }
+
+    fun updateToLoadingMore() {
+        state.update {
+            it.toLoadingMore()
+        }
+    }
+
+    fun updateToRefreshError(error: Throwable) {
+        state.update {
+            it.toRefreshError(error)
+        }
+    }
+
+    fun updateToLoadMoreError(error: Throwable) {
+        state.update {
+            it.toLoadMoreError(error)
+        }
+    }
+
+    fun replaceListAndUpdate(list: List<T>, hasMore: Boolean) {
+        state.update { it.replaceList(list, hasMore) }
+    }
+
+    fun appendListAndUpdate(list: List<T>, hasMore: Boolean) {
+        state.update { it.appendList(list, hasMore) }
+    }
+
+    fun replaceListAndUpdate(list: List<T>) {
+        state.update { it.replaceList(list, paging.hasMore(list.size)) }
+    }
+
+    fun appendListAndUpdate(list: List<T>) {
+        state.update { it.appendList(list, paging.hasMore(list.size)) }
+    }
+
+}
 
 class ListStateHandlerBuilder {
     internal var onEmpty: (() -> Unit)? = null
@@ -155,30 +236,4 @@ private fun <T> ListLayoutHost<T>.handleLoadingMoreState(loadMoreState: Triple<B
     } else {
         loadMoreCompleted(loadMoreState.second)
     }
-}
-
-fun <T> ListState<T>.toRefreshing(): ListState<T> {
-    return copy(isRefreshing = true, refreshError = null, isLoadingMore = false, loadMoreError = null)
-}
-
-fun <T> ListState<T>.toLoadingMore(): ListState<T> {
-    return copy(isRefreshing = false, refreshError = null, isLoadingMore = true, loadMoreError = null)
-}
-
-fun <T> ListState<T>.toRefreshError(refreshError: Throwable): ListState<T> {
-    return copy(isRefreshing = false, refreshError = refreshError)
-}
-
-fun <T> ListState<T>.replaceList(list: List<T>, hasMore: Boolean): ListState<T> {
-    return copy(data = list, isRefreshing = false, isLoadingMore = false, hasMore = hasMore)
-}
-
-fun <T> ListState<T>.appendList(list: List<T>, hasMore: Boolean): ListState<T> {
-    val oldList = data.toMutableList()
-    oldList.addAll(list)
-    return copy(data = oldList, isLoadingMore = false, hasMore = hasMore)
-}
-
-fun <T> ListState<T>.toLoadMoreError(loadMoreError: Throwable): ListState<T> {
-    return copy(isLoadingMore = false, loadMoreError = loadMoreError)
 }

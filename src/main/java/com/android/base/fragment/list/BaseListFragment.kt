@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.viewbinding.ViewBinding
 import com.android.base.adapter.DataManager
 import com.android.base.adapter.recycler.RecyclerAdapter
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost

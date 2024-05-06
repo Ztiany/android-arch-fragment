@@ -5,7 +5,7 @@ import android.util.SparseBooleanArray
 import android.util.SparseIntArray
 import android.util.SparseLongArray
 import androidx.core.util.isEmpty
-import com.android.base.app.AndroidSword
+import com.android.base.core.AndroidSword
 import com.android.base.foundation.state.Data
 import com.android.base.foundation.state.Error
 import com.android.base.foundation.state.Idle
