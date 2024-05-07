@@ -1,4 +1,4 @@
-package com.android.base.fragment.list
+package com.android.base.fragment.list.segment
 
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.ui.ListLayoutHost

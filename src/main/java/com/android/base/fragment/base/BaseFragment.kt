@@ -20,6 +20,7 @@ import com.android.base.delegate.fragment.FragmentDelegate
 import com.android.base.delegate.fragment.FragmentDelegateOwner
 import com.android.base.delegate.helper.FragmentDelegates
 import com.android.base.fragment.loadingViewHostFactory
+import com.android.base.fragment.ui.Message
 import timber.log.Timber
 
 /**
@@ -235,6 +236,10 @@ open class BaseFragment : Fragment(), OnBackPressListener, FragmentDelegateOwner
 
     override fun showMessage(@StringRes messageId: Int) {
         loadingView().showMessage(messageId)
+    }
+
+    override fun showMessage(message: Message) {
+        loadingView().showMessage(message)
     }
 
 }

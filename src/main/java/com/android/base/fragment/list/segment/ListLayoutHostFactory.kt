@@ -1,44 +1,50 @@
-package com.android.base.fragment.list
+package com.android.base.fragment.list.segment
 
 import android.view.View
 import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.OnRetryActionListener
-import com.android.base.fragment.ui.Paging
-import com.android.base.fragment.ui.RefreshLoadMoreView
-import com.android.base.fragment.ui.RefreshLoadMoreViewFactory
+import com.android.base.fragment.ui.RefreshView
+import com.android.base.fragment.ui.RefreshViewFactory
 import com.android.base.fragment.ui.StateLayout
 import com.android.base.fragment.ui.StateLayoutConfig
+import com.ztiany.loadmore.adapter.LoadMoreController
+import com.ztiany.loadmore.adapter.OnLoadMoreListener
+import timber.log.Timber
 
-class ListLayoutHostConfig2 {
+class ListLayoutHostConfig {
     var onRetry: ((state: Int) -> Unit)? = null
     var onRefresh: (() -> Unit)? = null
     var onLoadMore: (() -> Unit)? = null
 }
 
 /** It is useful when there is more than one list layout in a fragment. */
-fun <T> buildListLayoutHost2(
-    dataManager: ListDataHost<T>,
+fun <T> buildListLayoutHost(
+    listDataHost: ListDataHost<T>,
+    loadMoreController: LoadMoreController?,
     stateLayout: View,
-    refreshLoadMoreView: View,
-    config: ListLayoutHostConfig2.() -> Unit,
+    refreshLayout: View? = null,
+    config: ListLayoutHostConfig.() -> Unit,
 ): ListLayoutHost<T> {
 
     val stateLayoutImpl = (stateLayout as? StateLayout) ?: throw IllegalStateException("Make sure that stateLayout implements StateLayout.")
-    val refreshLoadMoreViewImpl = RefreshLoadMoreViewFactory.createRefreshLoadMoreView(refreshLoadMoreView)
 
-    val hostConfig = ListLayoutHostConfig2().apply(config)
+    val refreshLayoutImpl = if (refreshLayout != null) {
+        RefreshViewFactory.createRefreshView(refreshLayout)
+    } else {
+        null
+    }
 
-    refreshLoadMoreViewImpl.setRefreshHandler(object : RefreshLoadMoreView.RefreshHandler {
+    val hostConfig = ListLayoutHostConfig().apply(config)
+
+    refreshLayoutImpl?.setRefreshHandler(object : RefreshView.RefreshHandler() {
         override fun onRefresh() {
             hostConfig.onRefresh?.invoke()
         }
-    })
 
-    refreshLoadMoreViewImpl.setLoadMoreHandler(object : RefreshLoadMoreView.LoadMoreHandler {
-        override fun onLoadMore() {
-            hostConfig.onLoadMore?.invoke()
+        override fun canRefresh(): Boolean {
+            return true
         }
     })
 
@@ -48,70 +54,78 @@ fun <T> buildListLayoutHost2(
         }
     })
 
+    loadMoreController?.setOnLoadMoreListener(object : OnLoadMoreListener {
+        override fun onLoadMore() {
+            hostConfig.onLoadMore?.invoke()
+        }
+
+        override fun canLoadMore() = true
+    })
+
     return object : ListLayoutHost<T> {
 
+        override val paging = AutoPaging {
+            listDataHost.getListSize()
+        }
+
         override fun replaceData(data: List<T>) {
-            dataManager.replaceData(data)
+            listDataHost.replaceData(data)
         }
 
         override fun addData(data: List<T>) {
-            dataManager.addData(data)
+            listDataHost.addData(data)
         }
 
         override fun loadMoreCompleted(hasMore: Boolean) {
-            refreshLoadMoreViewImpl.loadMoreCompleted(hasMore)
+            loadMoreController?.loadCompleted(hasMore)
         }
 
         override fun loadMoreFailed() {
-            refreshLoadMoreViewImpl.loadMoreFailed()
-        }
-
-        override val paging: Paging = AutoPaging {
-            dataManager.getListSize()
+            loadMoreController?.loadFail()
         }
 
         override fun isEmpty(): Boolean {
-            return dataManager.isEmpty()
+            return listDataHost.isEmpty()
         }
 
         override fun getListSize(): Int {
-            return dataManager.getListSize()
+            return listDataHost.getListSize()
         }
 
         override fun isLoadingMore(): Boolean {
-            return refreshLoadMoreViewImpl.isLoadingMore()
+            return loadMoreController?.isLoadingMore ?: false
         }
 
         override fun setLoadingMore() {
-            refreshLoadMoreViewImpl.setLoadingMore()
-        }
-
-        override fun isRefreshing(): Boolean {
-            return refreshLoadMoreViewImpl.isRefreshing()
-        }
-
-        override fun setRefreshing() {
-            refreshLoadMoreViewImpl.setRefreshing()
+            loadMoreController?.setLoadingMore()
         }
 
         override var isLoadMoreEnable: Boolean
-            get() = refreshLoadMoreViewImpl.isLoadMoreEnable
-            set(value) {
-                refreshLoadMoreViewImpl.isLoadMoreEnable = value
+            get() = loadMoreController != null
+            set(_) {
+                Timber.w("setLoadMoreEnable() is not supported")
             }
 
         override fun autoRefresh() {
-            refreshLoadMoreViewImpl.autoRefresh()
+            refreshLayoutImpl?.autoRefresh()
         }
 
         override fun refreshCompleted() {
-            refreshLoadMoreViewImpl.refreshCompleted()
+            refreshLayoutImpl?.refreshCompleted()
+        }
+
+        override fun isRefreshing(): Boolean {
+            return refreshLayoutImpl?.isRefreshing() ?: false
+        }
+
+        override fun setRefreshing() {
+            refreshLayoutImpl?.setRefreshing()
         }
 
         override var isRefreshEnable: Boolean
-            get() = refreshLoadMoreViewImpl.isRefreshEnable
+            get() = refreshLayoutImpl?.isRefreshEnable ?: false
             set(value) {
-                refreshLoadMoreViewImpl.isRefreshEnable = value
+                refreshLayoutImpl?.isRefreshEnable = value
             }
 
         override fun showContentLayout() {
@@ -154,6 +168,6 @@ fun <T> buildListLayoutHost2(
             return stateLayoutImpl.currentStatus()
         }
 
-    }
+    }//object end.
 
 }

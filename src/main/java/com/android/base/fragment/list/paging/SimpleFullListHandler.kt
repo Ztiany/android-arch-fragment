@@ -1,8 +1,7 @@
-package com.android.base.fragment.epoxy
+package com.android.base.fragment.list.paging
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.android.base.arch.mvi.UIState
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.AutoPaging
@@ -28,7 +27,7 @@ data class ListState<T>(
     val isLoadingMore: Boolean = false,
     val loadMoreError: Throwable? = null,
     val hasMore: Boolean = false,
-) : UIState
+)
 
 fun <T> ListState<T>.toRefreshing(): ListState<T> {
     return copy(isRefreshing = true, refreshError = null, isLoadingMore = false, loadMoreError = null)

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.app.common.library)
     alias(libs.plugins.jetbrains.kotlin.kapt)
+    alias(libs.plugins.vanniktech.maven.publisher)
 }
 
 android {
@@ -14,11 +15,11 @@ android {
 
 dependencies {
     //  基础库
-    api(project(":base:core"))
-    api(project(":base:activity"))
-    api(project(":base:adapter"))
-    api(project(":base:viewbinding"))
-    api(project(":base:mvi"))
+    api(libs.base.arch.core)
+    api(libs.base.arch.activity)
+    api(libs.base.arch.adapter)
+    api(libs.base.arch.viewbinding)
+
     api(libs.ztiany.archdelegate)
     api(libs.ztiany.uistate)
 

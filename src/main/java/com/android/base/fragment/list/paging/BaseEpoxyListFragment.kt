@@ -1,10 +1,10 @@
-package com.android.base.fragment.epoxy
+package com.android.base.fragment.list.paging
 
 import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIFragment
-import com.android.base.fragment.list.buildListLayoutHost
+import com.android.base.fragment.list.segment.buildListLayoutHost
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost

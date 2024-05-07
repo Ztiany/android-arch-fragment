@@ -1,9 +1,9 @@
-package com.android.base.fragment.list
+package com.android.base.fragment.list.segment
 
 import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
-import com.android.base.fragment.base.BaseUIDialogFragment
+import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
@@ -12,10 +12,14 @@ import com.android.base.fragment.ui.StateLayoutConfig
 import kotlin.properties.Delegates
 
 /**
+ *  [BaseListFragment] 只能支持 RecyclerView。因为 [BaseListFragment] 采用包装 [androidx.recyclerview.widget.RecyclerView.Adapter] 的方式，在底
+ *  部添加 load more item 来实现加载更多。[BaseList2Fragment] 没有采用此种方式，所以你使用的 RefreshView 应该是同时支持下拉刷新和加载更多功能的。
+ *
+ *  在使用方式上，依然只适用于**分段式**提交列表数据的方式，具体参考 [BaseListFragment]。
+ *
  *@author Ztiany
- *@see [BaseList2Fragment]
  */
-abstract class BaseList2DialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
+abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), ListLayoutHost<T> {
 
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
@@ -38,13 +42,13 @@ abstract class BaseList2DialogFragment<T, VB : ViewBinding> : BaseUIDialogFragme
             vb.root.findViewById(CommonId.REFRESH_ID)
         ) {
             this.onLoadMore = {
-                this@BaseList2DialogFragment.onLoadMore()
+                this@BaseList2Fragment.onLoadMore()
             }
             this.onRefresh = {
-                this@BaseList2DialogFragment.onRefresh()
+                this@BaseList2Fragment.onRefresh()
             }
             this.onRetry = {
-                this@BaseList2DialogFragment.onRetry(it)
+                this@BaseList2Fragment.onRetry(it)
             }
         }
     }

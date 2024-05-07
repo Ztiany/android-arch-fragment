@@ -2,8 +2,8 @@ package com.android.base.fragment
 
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.anim.FragmentAnimator
-import com.android.base.fragment.epoxy.EpoxyLoadMoreViewFactory
-import com.android.base.fragment.epoxy.internalDefaultEpoxyLoadMoreViewFactory
+import com.android.base.fragment.list.paging.EpoxyLoadMoreViewFactory
+import com.android.base.fragment.list.paging.internalDefaultEpoxyLoadMoreViewFactory
 import com.android.base.fragment.tool.FragmentConfig
 import com.android.base.fragment.ui.LoadingViewHostFactory
 import com.android.base.fragment.ui.Paging

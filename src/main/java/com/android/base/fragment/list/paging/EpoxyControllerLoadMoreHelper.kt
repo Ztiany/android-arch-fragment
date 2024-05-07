@@ -1,11 +1,10 @@
-package com.android.base.fragment.epoxy
+package com.android.base.fragment.list.paging
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.OnModelBoundListener
 import com.airbnb.epoxy.OnModelUnboundListener
-import com.android.base.fragment.epoxy.LoadingMoreRowModel_
 import com.ztiany.loadmore.adapter.LoadMoreController
 import com.ztiany.loadmore.adapter.OnRecyclerViewScrollBottomListener
 

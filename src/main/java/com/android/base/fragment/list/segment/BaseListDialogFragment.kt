@@ -1,4 +1,4 @@
-package com.android.base.fragment.list
+package com.android.base.fragment.list.segment
 
 import android.os.Bundle
 import android.view.View

@@ -1,4 +1,4 @@
-package com.android.base.fragment.epoxy
+package com.android.base.fragment.list.paging
 
 // TODO: implement it.
 // Reference 1: <https://github.com/android/architecture-components-samples/tree/main/PagingWithNetworkSample>

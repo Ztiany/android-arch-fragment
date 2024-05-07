@@ -1,8 +1,7 @@
-package com.android.base.fragment.epoxy
+package com.android.base.fragment.list.paging
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.android.base.arch.mvi.UIState
 import com.android.base.fragment.ui.ListLayoutHost
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +18,7 @@ data class AdvancedListState<L, D, E>(
     val isLoadingMore: Boolean = false,
     val loadMoreError: Throwable? = null,
     val hasMore: Boolean = false,
-) : UIState
+)
 
 class AdvancedListStateHandlerBuilder {
 
