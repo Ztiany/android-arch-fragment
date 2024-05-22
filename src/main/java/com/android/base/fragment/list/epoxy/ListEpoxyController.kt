@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.paging
+package com.android.base.fragment.list.epoxy
 
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.TypedEpoxyController

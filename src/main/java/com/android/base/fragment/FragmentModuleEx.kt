@@ -2,8 +2,8 @@ package com.android.base.fragment
 
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.anim.FragmentAnimator
-import com.android.base.fragment.list.paging.EpoxyLoadMoreViewFactory
-import com.android.base.fragment.list.paging.internalDefaultEpoxyLoadMoreViewFactory
+import com.android.base.fragment.list.epoxy.EpoxyLoadMoreViewFactory
+import com.android.base.fragment.list.epoxy.internalDefaultEpoxyLoadMoreViewFactory
 import com.android.base.fragment.tool.FragmentConfig
 import com.android.base.fragment.ui.LoadingViewHostFactory
 import com.android.base.fragment.ui.Paging
@@ -16,7 +16,7 @@ import com.ztiany.loadmore.adapter.LoadMoreConfig
 /** 列表分页起始页。 */
 var AndroidSword.defaultPageStart: Int
     set(value) {
-        touch()
+        touchMe()
         Paging.defaultPagingStart = value
     }
     get() {
@@ -26,7 +26,7 @@ var AndroidSword.defaultPageStart: Int
 /** 列表分页大小。 */
 var AndroidSword.defaultPageSize: Int
     set(value) {
-        touch()
+        touchMe()
         Paging.defaultPagingSize = value
     }
     get() {
@@ -36,7 +36,7 @@ var AndroidSword.defaultPageSize: Int
 /** 设置一个默认的布局 id，在使用 Fragments 中相关方法时，如果没有传入特定的容器 id  时，则使用设置的默认布局 id。【必须配置】  */
 var AndroidSword.defaultFragmentContainerId: Int
     set(value) {
-        touch()
+        touchMe()
         FragmentConfig.setDefaultContainerId(value)
     }
     get() {
@@ -46,7 +46,7 @@ var AndroidSword.defaultFragmentContainerId: Int
 /**设置默认的 Fragment 转场动画 */
 var AndroidSword.defaultFragmentAnimator: FragmentAnimator
     set(value) {
-        touch()
+        touchMe()
         FragmentConfig.setDefaultFragmentAnimator(value)
     }
     get() {
@@ -55,7 +55,7 @@ var AndroidSword.defaultFragmentAnimator: FragmentAnimator
 
 var AndroidSword.refreshViewFactory: RefreshViewFactory.Factory?
     set(value) {
-        touch()
+        touchMe()
         RefreshViewFactory.registerFactory(value)
     }
     get() {
@@ -74,14 +74,14 @@ var AndroidSword.refreshViewFactory: RefreshViewFactory.Factory?
 /** 用于创建 LoadingView。【必须配置】 */
 var AndroidSword.loadingViewHostFactory: LoadingViewHostFactory?
     set(value) {
-        touch()
+        touchMe()
         internalLoadingViewHostFactory = value
     }
     get() = internalLoadingViewHostFactory
 
 var AndroidSword.refreshLoadViewFactory: RefreshLoadMoreViewFactory.Factory?
     set(value) {
-        touch()
+        touchMe()
         RefreshLoadMoreViewFactory.registerFactory(value)
     }
     get() {
@@ -91,7 +91,7 @@ var AndroidSword.refreshLoadViewFactory: RefreshLoadMoreViewFactory.Factory?
 /** 用于配置使用 epoxy 时，LoadMore Item 的视图 。 */
 var AndroidSword.epoxyLoadMoreViewFactory: EpoxyLoadMoreViewFactory
     set(value) {
-        touch()
+        touchMe()
         internalDefaultEpoxyLoadMoreViewFactory = value
     }
     get() = internalDefaultEpoxyLoadMoreViewFactory

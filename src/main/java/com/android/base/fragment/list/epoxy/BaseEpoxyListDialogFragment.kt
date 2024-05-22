@@ -1,9 +1,9 @@
-package com.android.base.fragment.list.paging
+package com.android.base.fragment.list.epoxy
 
 import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
-import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.list.segment.buildListLayoutHost
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
@@ -13,8 +13,8 @@ import com.android.base.fragment.ui.StateLayoutConfig
 import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
 
-/** This ListFragment works with [epoxy](https://github.com/airbnb/epoxy). You can use [handleListStateWithViewLifecycle] to handle received list data. */
-abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), ListLayoutHost<T> {
+/** This ListFragment works with epoxy. Only use [handleListStateWithViewLifecycle] to handle received list data. */
+abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
 
     private var loadMoreImpl: LoadMoreController? = null
 
@@ -48,13 +48,13 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
         ) {
 
             this.onRetry = {
-                this@BaseEpoxyListFragment.onRetry(it)
+                this@BaseEpoxyListDialogFragment.onRetry(it)
             }
             this.onRefresh = {
-                this@BaseEpoxyListFragment.onRefresh()
+                this@BaseEpoxyListDialogFragment.onRefresh()
             }
             this.onLoadMore = {
-                this@BaseEpoxyListFragment.onLoadMore()
+                this@BaseEpoxyListDialogFragment.onLoadMore()
             }
         }
     }
@@ -69,9 +69,12 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
         }
     }
 
-    protected open fun onRefresh() {}
+    protected open fun onRefresh() = onStartLoad()
 
-    protected open fun onLoadMore() {}
+    protected open fun onLoadMore() = onStartLoad()
+
+    /**called by [onRefresh] or [onLoadMore], you can get current loading type from [isRefreshing] or [isLoadingMore].*/
+    protected open fun onStartLoad() {}
 
     override fun replaceData(data: List<T>) = listLayoutHostImpl.replaceData(data)
 

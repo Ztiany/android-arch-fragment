@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.paging
+package com.android.base.fragment.list.paging3
 
 // TODO: implement it.
 // Reference 1: <https://github.com/android/architecture-components-samples/tree/main/PagingWithNetworkSample>

@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.paging
+package com.android.base.fragment.list.epoxy
 
 import android.content.Context
 import android.util.AttributeSet

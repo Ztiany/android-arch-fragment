@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.paging
+package com.android.base.fragment.list.epoxy
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle

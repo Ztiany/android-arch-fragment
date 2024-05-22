@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.paging;
+package com.android.base.fragment.list.epoxy;
 
 import com.ztiany.loadmore.adapter.Direction;
 import com.ztiany.loadmore.adapter.LoadMode;
