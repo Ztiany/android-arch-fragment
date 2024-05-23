@@ -12,8 +12,8 @@ import com.android.base.fragment.ui.StateLayoutConfig
 import kotlin.properties.Delegates
 
 /**
- *@author Ztiany
- *@see [BaseList2Fragment]
+ * @author Ztiany
+ * @see [BaseList2Fragment]
  */
 abstract class BaseList2DialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
 

@@ -18,7 +18,7 @@ import kotlin.properties.Delegates
 
 /**
  * @author Ztiany
- *@see [BaseListFragment]
+ * @see [BaseListFragment]
  */
 abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
 
@@ -111,7 +111,7 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
 
     override val paging: Paging
         get() = listLayoutHostImpl.paging
-    
+
     val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")
 

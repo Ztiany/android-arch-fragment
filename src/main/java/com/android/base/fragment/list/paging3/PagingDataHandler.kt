@@ -12,7 +12,6 @@ import com.android.base.fragment.ui.PagingHost
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 fun <H, T : Any> H.handlePagingDataWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
@@ -36,16 +35,9 @@ fun <H, T : Any> H.handlePagingDataWithViewLifecycle(
 private fun PagingHost.handleLoadState(adapter: PagingDataAdapter<*, *>, loadStates: CombinedLoadStates) {
     val isEmpty = adapter.snapshot().isEmpty()
     handlePagingRefreshState(loadStates.refresh, isEmpty)
-    Timber.d("loadStates append: ${loadStates.append}")
-    Timber.d("loadStates prepend: ${loadStates.prepend}")
-    Timber.d("loadStates mediator: ${loadStates.mediator}")
-    Timber.d("loadStates source: ${loadStates.source}")
-    Timber.d("loadStates refresh: ${loadStates.refresh}")
-    Timber.d("loadStates hasError: ${loadStates.hasError}")
-    Timber.d("loadStates isIdle: ${loadStates.isIdle}")
 }
 
-private fun PagingHost.handlePagingRefreshState(
+fun PagingHost.handlePagingRefreshState(
     refreshState: LoadState,
     isEmpty: Boolean,
     showContentLoadingWhenEmpty: Boolean = true,

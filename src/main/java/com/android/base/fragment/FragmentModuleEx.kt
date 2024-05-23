@@ -15,7 +15,7 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import com.ztiany.loadmore.adapter.LoadMode
 import com.ztiany.loadmore.adapter.LoadMoreConfig
 
-class FragmentModuleConfig {
+class FragmentModuleConfig internal constructor() {
 
     var defaultPageStart: Int
         set(value) {
@@ -62,7 +62,8 @@ class FragmentModuleConfig {
         }
 
     /** 加载更多的方式，默认为滑动到底部时自动加载更多。*/
-    @LoadMode var loadMoreMode: Int
+    @LoadMode
+    var loadMoreMode: Int
         get() {
             return LoadMoreConfig.getLoadMode()
         }

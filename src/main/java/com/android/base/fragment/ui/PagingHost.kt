@@ -1,5 +1,6 @@
 package com.android.base.fragment.ui
 
-interface PagingHost :StateLayoutHost {
+import com.android.base.fragment.list.paging3.BasePagingFragment
 
-}
+/** Serve for [BasePagingFragment]. */
+interface PagingHost : StateLayoutHost

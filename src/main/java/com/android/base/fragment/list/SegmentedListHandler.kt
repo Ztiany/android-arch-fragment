@@ -1,9 +1,10 @@
-package com.android.base.fragment.list.segment
+package com.android.base.fragment.list
 
 import com.android.base.core.AndroidSword
+import com.android.base.fragment.list.segment.BaseListFragment
 import com.android.base.fragment.ui.ListLayoutHost
 
-/** @see BaseListFragment */
+/** @see [BaseListFragment] */
 fun <D> ListLayoutHost<D>.handleListData(
     list: List<D>?,
     monopolizedEmptyHandler: Boolean = false,

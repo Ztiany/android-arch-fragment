@@ -11,6 +11,7 @@ import com.android.base.adapter.DataManager
 import com.android.base.adapter.recycler.RecyclerAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.list.handleListData
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.list.handleListStateWithViewLifecycle
 import com.android.base.fragment.list.segment.buildListLayoutHost
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
@@ -27,7 +28,7 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should invoke [setUpList] to return a real [ListLayoutHost].
+     *  2. You should use [setUpList] to return a real [ListLayoutHost].
      */
     abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): ListLayoutHost<T>
 

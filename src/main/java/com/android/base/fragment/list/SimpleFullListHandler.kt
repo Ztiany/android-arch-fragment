@@ -1,4 +1,4 @@
-package com.android.base.fragment.list.epoxy
+package com.android.base.fragment.list
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
