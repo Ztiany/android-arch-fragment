@@ -1,27 +1,24 @@
 package com.android.base.fragment.list.paging3
 
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DiffUtil.ItemCallback
 
-class IntIdentityDiffCallback(
-    private val oldList: List<IntIdentity>,
-    private val newList: List<IntIdentity>,
-    private val areItemSame: (IntIdentity, IntIdentity) -> Boolean = { old, new -> old.id == new.id },
-    private val areContentSame: (IntIdentity, IntIdentity) -> Boolean = { old, new -> old == new },
-    private val getChangePayload: (IntIdentity, IntIdentity) -> Any? = { _: IntIdentity, _: IntIdentity -> null },
-) : DiffUtil.Callback() {
+class IntIdentityDiffCallback<T : IntIdentity>(
+    private val areTheItemsSame: (T, T) -> Boolean = { old, new -> old.id == new.id },
+    private val areTheContentsSame: (T, T) -> Boolean = { old, new -> old == new },
+    private val getChangedPayload: (T, T) -> Any? = { _: IntIdentity, _: IntIdentity -> null },
+) : ItemCallback<T>() {
+    override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
+        return areTheItemsSame(oldItem, newItem)
+    }
 
-    override fun getOldListSize(): Int = oldList.size
+    override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
+        return areTheContentsSame(oldItem, newItem)
+    }
 
-    override fun getNewListSize(): Int = newList.size
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        areItemSame(oldList[oldItemPosition], newList[newItemPosition])
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        areContentSame(oldList[oldItemPosition], newList[newItemPosition])
-
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int) =
-        getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
+    override fun getChangePayload(oldItem: T, newItem: T): Any? {
+        return getChangedPayload(oldItem, newItem)
+    }
 
 }
 

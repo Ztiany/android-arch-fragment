@@ -1,6 +1,7 @@
 package com.android.base.fragment.ui
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import timber.log.Timber
 
 internal class SwipeRefreshView(
     private val swipeRefreshLayout: SwipeRefreshLayout,

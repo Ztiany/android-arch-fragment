@@ -6,8 +6,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
-import com.android.base.core.AndroidSword
-import com.android.base.fragment.epoxyLoadMoreViewFactory
 
 @ModelView(autoLayout = ModelView.Size.MANUAL)
 class LoadingMoreRow @JvmOverloads constructor(
@@ -16,7 +14,7 @@ class LoadingMoreRow @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val epoxyLoadMoreView: EpoxyLoadMoreView = AndroidSword.epoxyLoadMoreViewFactory.inflateLoadingMoreView(this, 0)
+    private val epoxyLoadMoreView: EpoxyLoadMoreView = internalDefaultEpoxyLoadMoreViewFactory.inflateLoadingMoreView(this, 0)
 
     @ModelProp
     fun setState(@LoadMoreViewState state: Int) {

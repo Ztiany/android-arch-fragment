@@ -33,6 +33,7 @@ dependencies {
     api(libs.androidx.swiperefreshlayout)
     api(libs.google.ui.material)
     api(libs.androidx.viewpager2)
+    compileOnly(libs.androidx.paging.runtime)
 
     // kotlin
     api(libs.kotlin.stdlib)

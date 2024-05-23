@@ -36,11 +36,11 @@ fun <T> buildListLayoutHost(
         null
     }
 
-    val hostConfig = ListLayoutHostConfig().apply(config)
+    val listLayoutHostConfig = ListLayoutHostConfig().apply(config)
 
     refreshLayoutImpl?.setRefreshHandler(object : RefreshView.RefreshHandler() {
         override fun onRefresh() {
-            hostConfig.onRefresh?.invoke()
+            listLayoutHostConfig.onRefresh?.invoke()
         }
 
         override fun canRefresh(): Boolean {
@@ -50,13 +50,13 @@ fun <T> buildListLayoutHost(
 
     stateLayoutImpl.stateLayoutConfig.setStateRetryListener(object : OnRetryActionListener {
         override fun onRetry(state: Int) {
-            hostConfig.onRetry?.invoke(state)
+            listLayoutHostConfig.onRetry?.invoke(state)
         }
     })
 
     loadMoreController?.setOnLoadMoreListener(object : OnLoadMoreListener {
         override fun onLoadMore() {
-            hostConfig.onLoadMore?.invoke()
+            listLayoutHostConfig.onLoadMore?.invoke()
         }
 
         override fun canLoadMore() = true

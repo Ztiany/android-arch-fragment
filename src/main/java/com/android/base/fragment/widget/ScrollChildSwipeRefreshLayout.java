@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.core.view.ViewCompat;
@@ -27,6 +28,8 @@ public class ScrollChildSwipeRefreshLayout extends SwipeRefreshLayout {
 
     private final boolean mRestoreRefreshStatus;
 
+    private boolean mInterceptTouchEvent = true;
+
     public ScrollChildSwipeRefreshLayout(Context context) {
         this(context, null);
     }
@@ -37,6 +40,7 @@ public class ScrollChildSwipeRefreshLayout extends SwipeRefreshLayout {
         mTargetId = typedArray.getResourceId(R.styleable.ScrollChildSwipeRefreshLayout_srl_target_id, 0);
         int colorSchemeArrayId = typedArray.getResourceId(R.styleable.ScrollChildSwipeRefreshLayout_srl_color_scheme, 0);
         mRestoreRefreshStatus = typedArray.getBoolean(R.styleable.ScrollChildSwipeRefreshLayout_srl_restore_refresh_status, true);
+        mInterceptTouchEvent = typedArray.getBoolean(R.styleable.ScrollChildSwipeRefreshLayout_srl_intercept_event, true);
         typedArray.recycle();
 
         if (colorSchemeArrayId != 0) {
@@ -86,6 +90,14 @@ public class ScrollChildSwipeRefreshLayout extends SwipeRefreshLayout {
     @SuppressWarnings("unused")
     public void setScrollUpChild(View view) {
         mScrollUpChild = view;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (!mInterceptTouchEvent) {
+            return false;
+        }
+        return super.onInterceptTouchEvent(ev);
     }
 
 }

@@ -7,6 +7,7 @@ import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.Paging
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -109,7 +110,7 @@ class ListStateHelper<T>(
 class ListStateHandlerBuilder {
     internal var onEmpty: (() -> Unit)? = null
     internal var onError: ((isRefresh: Boolean, error: Throwable) -> Unit)? = null
-    internal var showContentLoadingWhenEmpty = false
+    internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
     internal var customErrorHandler = false
     internal var customEmptyHandler = false
 
@@ -123,8 +124,8 @@ class ListStateHandlerBuilder {
         customErrorHandler = monopolized
     }
 
-    fun useContentLoadingWhenEmpty() {
-        showContentLoadingWhenEmpty = true
+    fun showContentLoadingWhenEmpty(enable: Boolean) {
+        showContentLoadingWhenEmpty = enable
     }
 }
 
@@ -173,7 +174,10 @@ fun <H, T> H.handleListStateWithViewLifecycle(
     }
 }
 
-private fun <T> ListLayoutHost<T>.handleRefreshState(refreshState: Pair<Boolean, Throwable?>, listStateHandler: ListStateHandlerBuilder) {
+private fun <T> ListLayoutHost<T>.handleRefreshState(
+    refreshState: Pair<Boolean/*is refreshing*/, Throwable?>,
+    listStateHandler: ListStateHandlerBuilder,
+) {
     // refreshing
     if (refreshState.first) {
         if (isEmpty() && listStateHandler.showContentLoadingWhenEmpty && !isRefreshing()) {

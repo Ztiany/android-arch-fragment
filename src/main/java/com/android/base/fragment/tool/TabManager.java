@@ -35,6 +35,7 @@ public abstract class TabManager {
     private final boolean mEnableMaxLifecycle;
     private final Lifecycle.State mMaxLifecycle;
 
+    @SuppressWarnings("unused")
     public TabManager(Context context, FragmentManager fragmentManager, Tabs tabs, int containerId) {
         this(context, fragmentManager, tabs, containerId, SHOW_HIDE, true);
     }
@@ -58,6 +59,7 @@ public abstract class TabManager {
     /**
      * @param operationType {@link #ATTACH_DETACH} or {@link #SHOW_HIDE}
      */
+    @SuppressWarnings("unused")
     public TabManager(Context context, FragmentManager fragmentManager, Tabs tabs, int containerId, int operationType, Lifecycle.State maxLifeState) {
         if (operationType != ATTACH_DETACH && operationType != SHOW_HIDE) {
             throw new IllegalArgumentException("the operationType must be ATTACH_DETACH or SHOW_HIDE");
@@ -98,16 +100,16 @@ public abstract class TabManager {
         if (mCurrentId == pageId) {
             return;
         }
-        FragmentTransaction ft = null;
+        FragmentTransaction fragmentTransaction = null;
         if (mCurrentFragmentInfo != null) {
             Fragment fragment = mCurrentFragmentInfo.getInstance();
             if (fragment != null) {
-                ft = mFragmentManager.beginTransaction();
-                hideOrDetach(ft, fragment);
+                fragmentTransaction = mFragmentManager.beginTransaction();
+                hideOrDetach(fragmentTransaction, fragment);
             }
         }
-        if (ft != null) {
-            ft.commit();
+        if (fragmentTransaction != null) {
+            fragmentTransaction.commit();
         }
         doChangeTab(pageId);
     }
@@ -171,6 +173,10 @@ public abstract class TabManager {
 
     public void onSaveInstanceState(Bundle bundle) {
         bundle.putInt(CURRENT_ID_KET, mCurrentId);
+    }
+
+    public int tableSize() {
+        return mMainTabs.size();
     }
 
     public static abstract class Tabs {

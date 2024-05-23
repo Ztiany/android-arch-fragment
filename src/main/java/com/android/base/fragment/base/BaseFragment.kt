@@ -12,15 +12,14 @@ import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import com.android.base.activity.OnBackPressListener
 import com.android.base.activity.fragmentHandleBackPress
-import com.android.base.core.AndroidSword
-import com.android.base.fragment.tool.dismissDialog
-import com.android.base.fragment.ui.LoadingViewHost
 import com.android.base.delegate.State
 import com.android.base.delegate.fragment.FragmentDelegate
 import com.android.base.delegate.fragment.FragmentDelegateOwner
 import com.android.base.delegate.helper.FragmentDelegates
-import com.android.base.fragment.loadingViewHostFactory
+import com.android.base.fragment.tool.dismissDialog
+import com.android.base.fragment.ui.LoadingViewHost
 import com.android.base.fragment.ui.Message
+import com.android.base.fragment.ui.internalLoadingViewHostFactory
 import timber.log.Timber
 
 /**
@@ -189,7 +188,7 @@ open class BaseFragment : Fragment(), OnBackPressListener, FragmentDelegateOwner
         return if (loadingViewImpl != null) {
             loadingViewImpl
         } else {
-            loadingViewHost = onCreateLoadingView() ?: AndroidSword.loadingViewHostFactory?.invoke(requireContext())
+            loadingViewHost = onCreateLoadingView() ?: internalLoadingViewHostFactory?.invoke(requireContext())
             loadingViewHost ?: throw NullPointerException("you need to config LoadingViewFactory in Sword or implement onCreateLoadingView.")
         }
     }

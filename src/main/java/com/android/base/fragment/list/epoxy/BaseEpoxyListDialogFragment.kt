@@ -10,6 +10,7 @@ import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.Paging
 import com.android.base.fragment.ui.StateLayoutConfig
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
 
@@ -37,7 +38,6 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
         listDataHost: ListDataHost<T>,
         loadMoreController: LoadMoreController? = null,
     ): ListLayoutHost<T> {
-
         this.loadMoreImpl = loadMoreController
 
         return buildListLayoutHost(
@@ -60,6 +60,11 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
     }
 
     protected open fun onRetry(@StateLayoutConfig.RetryableState state: Int) {
+        if (!internalRetryByAutoRefresh) {
+            onRefresh()
+            return
+        }
+
         if (listLayoutHostImpl.isRefreshEnable) {
             if (!isRefreshing()) {
                 listLayoutHostImpl.autoRefresh()
