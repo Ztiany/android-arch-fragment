@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.viewbinding.ViewBinding
 import com.android.base.adapter.DataManager
-import com.android.base.adapter.recycler.RecyclerAdapter
+import com.android.base.adapter.recycler.BaseRecyclerAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.list.handleListData
@@ -24,7 +24,7 @@ import kotlin.properties.Delegates
 /**
  * 通用的基于 RecyclerView 的列表界面，支持下拉刷新和加载更多。其一般的使用方式如下：
  *
- * 1. 列表数据由 [DataManager] 来管理，[DataManager] 一般是由 Adapter 实现，比如 [RecyclerAdapter]；
+ * 1. 列表数据由 [DataManager] 来管理，[DataManager] 一般是由 Adapter 实现，比如 [BaseRecyclerAdapter]；
  * 2. 在 [BaseListFragment] 中通过 [lifecycleScope] 来分段加载数据，然后累加到 [DataManager]  中；
  * 3. 在 [BaseListFragment] 被销毁重建（因配置发送改变）后，所有的 UI 状态和已经加载的数据都会被重置，未完成的加载也会被取消。
  * 4. 所有对列表的 Item 的操作，都在 [DataManager] 中进行。
