@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.viewbinding.ViewBinding
 import com.android.base.adapter.DataManager
-import com.android.base.adapter.recycler.BaseRecyclerAdapter
+import com.android.base.adapter.recycler.segment.BaseRecyclerAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIFragment
 import com.android.base.fragment.list.handleListData

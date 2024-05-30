@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.state.buildStateLayoutHost
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.PagingHost
@@ -15,7 +15,7 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
 /**
  * A [Fragment] works with paging3.
  */
-abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>(), PagingHost {
+abstract class BasePagingDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<VB>(), PagingHost {
 
     private lateinit var stateLayoutHostImpl: StateLayoutHost
 
@@ -25,10 +25,10 @@ abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>(), Pagi
             view.findViewById(CommonId.REFRESH_ID)
         ) {
             this.onRefresh = {
-                this@BasePagingFragment.onRefresh()
+                this@BasePagingDialogFragment.onRefresh()
             }
             this.onRetry = {
-                this@BasePagingFragment.onRetry(it)
+                this@BasePagingDialogFragment.onRetry(it)
             }
         }
     }

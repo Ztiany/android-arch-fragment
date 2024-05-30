@@ -5,6 +5,8 @@ import com.android.base.core.AndroidSword.touchMe
 import com.android.base.fragment.anim.FragmentAnimator
 import com.android.base.fragment.list.epoxy.EpoxyLoadMoreViewFactory
 import com.android.base.fragment.list.epoxy.internalDefaultEpoxyLoadMoreViewFactory
+import com.android.base.fragment.list.paging3.PagingLoadMoreViewFactory
+import com.android.base.fragment.list.paging3.internalDefaultPagingLoadMoreViewFactory
 import com.android.base.fragment.tool.FragmentConfig
 import com.android.base.fragment.ui.LoadingViewHostFactory
 import com.android.base.fragment.ui.Paging
@@ -93,6 +95,14 @@ class FragmentModuleConfig internal constructor() {
             internalDefaultEpoxyLoadMoreViewFactory = value
         }
         get() = internalDefaultEpoxyLoadMoreViewFactory
+
+    /** 用于配置使用 Paging3 时，LoadMore Item 的视图 。 */
+    var pagingLoadMoreViewFactory: PagingLoadMoreViewFactory
+        set(value) {
+            touchMe()
+            internalDefaultPagingLoadMoreViewFactory = value
+        }
+        get() = internalDefaultPagingLoadMoreViewFactory
 
 
     /**
