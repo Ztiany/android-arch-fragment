@@ -12,18 +12,25 @@ abstract class Paging {
     /** the size of each page. */
     abstract val size: Int
 
+    /** accumulated page size. Note: If your items can be removed form your list. this number don't equals your real item counts.  */
+    abstract val total: Int
+
+    /** current page number */
+    abstract val current: Int
+
+    /** next  page number */
+    abstract val next: Int
+
+    abstract fun onPageAppended(size: Int)
+
+    abstract fun onPageRefreshed(size: Int)
+
     fun hasMore(size: Int): Boolean {
         return size >= this.size
     }
 
-    abstract val total: Int
-
-    abstract val current: Int
-
-    abstract val next: Int
-
-    fun getLoadingPage(firstPage: Boolean): Int {
-        return if (firstPage) {
+    fun getLoadingPage(isRefresh: Boolean): Int {
+        return if (isRefresh) {
             current
         } else {
             next

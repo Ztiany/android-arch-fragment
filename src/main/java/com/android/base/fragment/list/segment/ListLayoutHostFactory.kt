@@ -70,10 +70,12 @@ fun <T> buildListLayoutHost(
 
         override fun replaceData(data: List<T>) {
             listDataHost.replaceData(data)
+            paging.onPageRefreshed(data.size)
         }
 
         override fun addData(data: List<T>) {
             listDataHost.addData(data)
+            paging.onPageAppended(data.size)
         }
 
         override fun loadMoreCompleted(hasMore: Boolean) {
