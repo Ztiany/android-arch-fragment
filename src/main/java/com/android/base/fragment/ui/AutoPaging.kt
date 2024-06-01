@@ -28,16 +28,16 @@ class AutoPaging(
     override val next: Int
         get() = current + 1
 
-    override fun onPageAppended(size: Int) {
-        accumulatedTotal += size
+    override fun onPageAppended(appendedSize: Int) {
+        accumulatedTotal += appendedSize
         accumulatedPage++
         Timber.d("onPageAppended: accumulatedTotal = $accumulatedTotal, accumulatedPage = $accumulatedPage")
         // it is only for test
         calculatePageNumber(totalSize(), size, start)
     }
 
-    override fun onPageRefreshed(size: Int) {
-        accumulatedTotal = size
+    override fun onPageRefreshed(loadedSize: Int) {
+        accumulatedTotal = loadedSize
         accumulatedPage = start
         Timber.d("onPageRefreshed: accumulatedTotal = $accumulatedTotal, accumulatedPage = $accumulatedPage")
         // it is only for test

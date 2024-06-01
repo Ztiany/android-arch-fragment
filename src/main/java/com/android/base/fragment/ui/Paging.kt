@@ -21,12 +21,12 @@ abstract class Paging {
     /** next  page number */
     abstract val next: Int
 
-    abstract fun onPageAppended(size: Int)
+    abstract fun onPageAppended(appendedSize: Int)
 
-    abstract fun onPageRefreshed(size: Int)
+    abstract fun onPageRefreshed(loadedSize: Int)
 
-    fun hasMore(size: Int): Boolean {
-        return size >= this.size
+    fun hasMore(loadedSize: Int): Boolean {
+        return loadedSize >= this.size
     }
 
     fun getLoadingPage(isRefresh: Boolean): Int {
