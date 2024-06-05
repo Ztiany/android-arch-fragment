@@ -28,7 +28,7 @@ import com.android.base.fragment.ui.StateLayoutConfig.ViewState;
 /**
  * View that contains 7 different states: Content, Error/NetError/ServerError, Empty, and Loading/Request.
  */
-public class MultiStateView extends FrameLayout {
+public class MultiStateLayout extends FrameLayout {
 
     private LayoutInflater mInflater;
 
@@ -45,16 +45,16 @@ public class MultiStateView extends FrameLayout {
     @ViewState
     private int mViewState = CONTENT;
 
-    public MultiStateView(Context context) {
+    public MultiStateLayout(Context context) {
         this(context, null);
     }
 
-    public MultiStateView(Context context, AttributeSet attrs) {
+    public MultiStateLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(attrs, 0);
     }
 
-    public MultiStateView(Context context, AttributeSet attrs, int defStyle) {
+    public MultiStateLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(attrs, defStyle);
     }
@@ -63,14 +63,14 @@ public class MultiStateView extends FrameLayout {
         mChildren = new SparseArray<>();
         mInflater = LayoutInflater.from(getContext());
 
-        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MultiStateView, defStyle, 0);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MultiStateLayout, defStyle, 0);
 
-        int loadingViewResId = a.getResourceId(R.styleable.MultiStateView_msv_loadingView, -1);
-        int requestingViewResId = a.getResourceId(R.styleable.MultiStateView_msv_requestingView, -1);
-        int emptyViewResId = a.getResourceId(R.styleable.MultiStateView_msv_emptyView, -1);
-        int errorViewResId = a.getResourceId(R.styleable.MultiStateView_msv_errorView, -1);
-        int netErrorViewResId = a.getResourceId(R.styleable.MultiStateView_msv_net_errorView, -1);
-        int serverErrorViewResId = a.getResourceId(R.styleable.MultiStateView_msv_server_errorView, -1);
+        int loadingViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_loadingView, -1);
+        int requestingViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_requestingView, -1);
+        int emptyViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_emptyView, -1);
+        int errorViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_errorView, -1);
+        int netErrorViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_net_errorView, -1);
+        int serverErrorViewResId = a.getResourceId(R.styleable.MultiStateLayout_msl_server_errorView, -1);
 
         mChildren.put(LOADING, new ViewHolder(loadingViewResId));
         mChildren.put(REQUESTING, new ViewHolder(requestingViewResId));
@@ -79,10 +79,10 @@ public class MultiStateView extends FrameLayout {
         mChildren.put(NET_ERROR, new ViewHolder(netErrorViewResId));
         mChildren.put(SERVER_ERROR, new ViewHolder(serverErrorViewResId));
 
-        mDisableOperationWhenRequesting = a.getBoolean(R.styleable.MultiStateView_msv_disable_when_requesting, false);
-        mAlwaysShowContentView = a.getBoolean(R.styleable.MultiStateView_msv_always_show_content, false);
+        mDisableOperationWhenRequesting = a.getBoolean(R.styleable.MultiStateLayout_msl_disable_when_requesting, false);
+        mAlwaysShowContentView = a.getBoolean(R.styleable.MultiStateLayout_msl_always_show_content, false);
 
-        ensureInitState(a.getInt(R.styleable.MultiStateView_msv_viewState, CONTENT));
+        ensureInitState(a.getInt(R.styleable.MultiStateLayout_msl_viewState, CONTENT));
 
         a.recycle();
     }
@@ -137,7 +137,7 @@ public class MultiStateView extends FrameLayout {
     }
 
     /* All of the addView methods have been overridden so that it can obtain the content view via XML
-     It is NOT recommended to add views into MultiStateView via the addView methods, but rather use
+     It is NOT recommended to add views into MultiStateLayout via the addView methods, but rather use
      any of the setViewForState methods to set views for their given ContentViewState accordingly */
     @Override
     public void addView(View child) {
@@ -253,9 +253,9 @@ public class MultiStateView extends FrameLayout {
     /**
      * Sets the current {@link ViewState}
      *
-     * @param state The {@link ViewState} to set {@link MultiStateView} to
+     * @param state The {@link ViewState} to set {@link MultiStateLayout} to
      */
-    public void setViewState(@ViewState int state) {
+    public void setLayoutState(@ViewState int state) {
         if (state != mViewState) {
             mViewState = state;
             setView();

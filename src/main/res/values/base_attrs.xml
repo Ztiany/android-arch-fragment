@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="MultiStateView">
+    <declare-styleable name="MultiStateLayout">
         <!-- disable interaction while state is requesting. the default is false. -->
-        <attr name="msv_disable_when_requesting" format="boolean" />
+        <attr name="msl_disable_when_requesting" format="boolean" />
         <!-- always show content view. the default is false. -->
-        <attr name="msv_always_show_content" format="boolean" />
+        <attr name="msl_always_show_content" format="boolean" />
 
-        <attr name="msv_loadingView" format="reference" />
-        <attr name="msv_requestingView" format="reference" />
-        <attr name="msv_emptyView" format="reference" />
-        <attr name="msv_errorView" format="reference" />
-        <attr name="msv_net_errorView" format="reference" />
-        <attr name="msv_server_errorView" format="reference" />
-        <attr name="msv_viewState" format="enum">
+        <attr name="msl_loadingView" format="reference" />
+        <attr name="msl_requestingView" format="reference" />
+        <attr name="msl_emptyView" format="reference" />
+        <attr name="msl_errorView" format="reference" />
+        <attr name="msl_net_errorView" format="reference" />
+        <attr name="msl_server_errorView" format="reference" />
+        <attr name="msl_viewState" format="enum">
             <enum name="content" value="1" />
             <enum name="loading" value="2" />
             <enum name="empty" value="3" />
@@ -25,26 +25,25 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="SimpleMultiStateView">
+    <declare-styleable name="SimpleMultiStateLayout">
 
-        <attr name="msv_state_processor" format="string" />
+        <attr name="msl_state_processor" format="string" />
 
-        <attr name="msv_errorImg" format="reference" />
-        <attr name="msv_errorText" format="string" />
-        <attr name="msv_errorAction" format="string" />
+        <attr name="msl_errorImg" format="reference" />
+        <attr name="msl_errorText" format="string" />
+        <attr name="msl_errorAction" format="string" />
 
-        <attr name="msv_net_errorImg" format="reference" />
-        <attr name="msv_net_errorText" format="string" />
-        <attr name="msv_net_errorAction" format="string" />
+        <attr name="msl_net_errorImg" format="reference" />
+        <attr name="msl_net_errorText" format="string" />
+        <attr name="msl_net_errorAction" format="string" />
 
-        <attr name="msv_server_errorImg" format="reference" />
-        <attr name="msv_server_errorText" format="string" />
-        <attr name="msv_server_errorAction" format="string" />
+        <attr name="msl_server_errorImg" format="reference" />
+        <attr name="msl_server_errorText" format="string" />
+        <attr name="msl_server_errorAction" format="string" />
 
-        <attr name="msv_emptyImg" format="reference" />
-        <attr name="msv_emptyText" format="string" />
-        <attr name="msv_emptyAction" format="string" />
-
+        <attr name="msl_emptyImg" format="reference" />
+        <attr name="msl_emptyText" format="string" />
+        <attr name="msl_emptyAction" format="string" />
     </declare-styleable>
 
     <declare-styleable name="ScrollChildSwipeRefreshLayout">

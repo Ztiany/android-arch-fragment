@@ -12,7 +12,7 @@ import com.android.base.fragment.ui.StateLayoutConfig;
  */
 public abstract class StateProcessor {
 
-    protected abstract void onInitialize(SimpleMultiStateView simpleMultiStateView);
+    protected abstract void onInitialize(SimpleMultiStateLayout simpleMultiStateLayout);
 
     protected abstract void onParseAttrs(TypedArray typedArray);
 

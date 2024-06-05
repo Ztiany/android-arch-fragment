@@ -7,14 +7,14 @@
     android:layout_height="match_parent"
     app:srl_target_id="@id/recycler_view">
 
-    <com.android.base.fragment.widget.SimpleMultiStateView style="@style/BaseArchStyle.SimpleMultiStateView">
+    <com.android.base.fragment.widget.SimpleMultiStateLayout style="@style/BaseArchStyle.SimpleMultiStateLayout">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </com.android.base.fragment.widget.SimpleMultiStateView>
+    </com.android.base.fragment.widget.SimpleMultiStateLayout>
 
 </com.android.base.fragment.widget.ScrollChildSwipeRefreshLayout>
 

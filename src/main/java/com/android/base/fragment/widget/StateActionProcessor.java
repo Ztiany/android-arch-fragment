@@ -35,34 +35,34 @@ public class StateActionProcessor extends StateProcessor {
     private ViewInfo mNetErrorViewInfo;
     private ViewInfo mServerErrorViewInfo;
 
-    private SimpleMultiStateView mSimpleMultiStateView;
+    private SimpleMultiStateLayout mSimpleMultiStateLayout;
 
     @Override
-    public void onInitialize(SimpleMultiStateView simpleMultiStateView) {
-        mSimpleMultiStateView = simpleMultiStateView;
+    public void onInitialize(SimpleMultiStateLayout simpleMultiStateLayout) {
+        mSimpleMultiStateLayout = simpleMultiStateLayout;
     }
 
     @Override
     public void onParseAttrs(TypedArray typedArray) {
         mErrorViewInfo = new ViewInfo(ERROR);
-        mErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateView_msv_errorImg);
-        mErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateView_msv_errorText);
-        mErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateView_msv_errorAction);
+        mErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateLayout_msl_errorImg);
+        mErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_errorText);
+        mErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_errorAction);
 
         mEmptyViewInfo = new ViewInfo(EMPTY);
-        mEmptyViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateView_msv_emptyImg);
-        mEmptyViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateView_msv_emptyText);
-        mEmptyViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateView_msv_emptyAction);
+        mEmptyViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateLayout_msl_emptyImg);
+        mEmptyViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_emptyText);
+        mEmptyViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_emptyAction);
 
         mNetErrorViewInfo = new ViewInfo(NET_ERROR);
-        mNetErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateView_msv_net_errorImg);
-        mNetErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateView_msv_net_errorText);
-        mNetErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateView_msv_net_errorAction);
+        mNetErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateLayout_msl_net_errorImg);
+        mNetErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_net_errorText);
+        mNetErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_net_errorAction);
 
         mServerErrorViewInfo = new ViewInfo(SERVER_ERROR);
-        mServerErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateView_msv_server_errorImg);
-        mServerErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateView_msv_server_errorText);
-        mServerErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateView_msv_server_errorAction);
+        mServerErrorViewInfo.mDrawable = typedArray.getDrawable(R.styleable.SimpleMultiStateLayout_msl_server_errorImg);
+        mServerErrorViewInfo.mMessage = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_server_errorText);
+        mServerErrorViewInfo.mActionText = typedArray.getText(R.styleable.SimpleMultiStateLayout_msl_server_errorAction);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class StateActionProcessor extends StateProcessor {
 
         @Override
         public StateLayoutConfig setStateIcon(@ViewState int state, @DrawableRes int drawableId) {
-            getViewInfoForState(state).setDrawable(ContextCompat.getDrawable(mSimpleMultiStateView.getContext(), drawableId));
+            getViewInfoForState(state).setDrawable(ContextCompat.getDrawable(mSimpleMultiStateLayout.getContext(), drawableId));
             return this;
         }
 
@@ -186,7 +186,7 @@ public class StateActionProcessor extends StateProcessor {
 
         @Override
         public StateLayoutConfig disableOperationWhenRequesting(boolean disable) {
-            mSimpleMultiStateView.setDisableOperationWhenRequesting(disable);
+            mSimpleMultiStateLayout.setDisableOperationWhenRequesting(disable);
             return this;
         }
 

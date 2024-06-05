@@ -23,25 +23,25 @@ import timber.log.Timber;
 /**
  * @author Ztiany
  */
-public class SimpleMultiStateView extends MultiStateView implements StateLayout {
+public class SimpleMultiStateLayout extends MultiStateLayout implements StateLayout {
 
     private StateProcessor mStateProcessor;
 
     private StateListener mStateListener;
 
-    public SimpleMultiStateView(Context context) {
+    public SimpleMultiStateLayout(Context context) {
         this(context, null);
     }
 
-    public SimpleMultiStateView(Context context, AttributeSet attrs) {
+    public SimpleMultiStateLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SimpleMultiStateView(Context context, AttributeSet attrs, int defStyle) {
+    public SimpleMultiStateLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setListener();
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleMultiStateView, defStyle, defStyle);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleMultiStateLayout, defStyle, defStyle);
         initProcessor(typedArray);
 
         mStateProcessor.onInitialize(this);
@@ -51,14 +51,13 @@ public class SimpleMultiStateView extends MultiStateView implements StateLayout 
     }
 
     private void initProcessor(TypedArray typedArray) {
-        String processorPath = typedArray.getString(R.styleable.SimpleMultiStateView_msv_state_processor);
+        String processorPath = typedArray.getString(R.styleable.SimpleMultiStateLayout_msl_state_processor);
 
         if (!TextUtils.isEmpty(processorPath)) {
             try {
                 Class<?> processorClass = Class.forName(processorPath);
                 mStateProcessor = (StateProcessor) processorClass.newInstance();
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
                 Timber.e("initProcessor() called can not instance processor: %s", processorPath);
             }
         }
@@ -98,42 +97,42 @@ public class SimpleMultiStateView extends MultiStateView implements StateLayout 
 
     @Override
     public void showContentLayout() {
-        setViewState(CONTENT);
+        setLayoutState(CONTENT);
     }
 
     @Override
     public void showLoadingLayout() {
-        setViewState(LOADING);
+        setLayoutState(LOADING);
     }
 
     @Override
     public void showEmptyLayout() {
-        setViewState(EMPTY);
+        setLayoutState(EMPTY);
     }
 
     @Override
     public void showErrorLayout() {
-        setViewState(ERROR);
+        setLayoutState(ERROR);
     }
 
     @Override
     public void showRequesting() {
-        setViewState(StateLayoutConfig.REQUESTING);
+        setLayoutState(StateLayoutConfig.REQUESTING);
     }
 
     @Override
     public void showBlank() {
-        setViewState(StateLayoutConfig.BLANK);
+        setLayoutState(StateLayoutConfig.BLANK);
     }
 
     @Override
     public void showNetErrorLayout() {
-        setViewState(StateLayoutConfig.NET_ERROR);
+        setLayoutState(StateLayoutConfig.NET_ERROR);
     }
 
     @Override
     public void showServerErrorLayout() {
-        setViewState(StateLayoutConfig.SERVER_ERROR);
+        setLayoutState(StateLayoutConfig.SERVER_ERROR);
     }
 
     @Override
