@@ -3,10 +3,23 @@
 package com.android.base.fragment.base
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import com.android.base.activity.collectFlowRepeatedlyOnLifecycle
 import com.android.base.core.AndroidSword
-import com.android.base.foundation.state.*
+import com.android.base.foundation.state.Data
+import com.android.base.foundation.state.Error
+import com.android.base.foundation.state.Idle
+import com.android.base.foundation.state.Loading
+import com.android.base.foundation.state.NoData
+import com.android.base.foundation.state.State
+import com.android.base.foundation.state.Success
+import com.android.base.foundation.state.onData
+import com.android.base.foundation.state.onError
+import com.android.base.foundation.state.onLoadingWithStep
+import com.android.base.foundation.state.onNoData
+import com.android.base.foundation.state.onSuccess
 import com.android.base.fragment.tool.collectFlowRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.LoadingViewHost
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +34,7 @@ fun LoadingViewHost.dismissLoadingDialogDelayed(onDismiss: (() -> Unit)? = null)
 }
 
 /** Configure how to handle UI state [State]. */
-class ResourceHandlerBuilder<L, D, E> {
+class StateHandlerBuilder<L, D, E> {
 
     internal var onLoading: ((step: L?) -> Unit)? = null
     internal var onLoadingEnd: (() -> Unit)? = null
@@ -40,6 +53,7 @@ class ResourceHandlerBuilder<L, D, E> {
     internal var loadingMessage: CharSequence = ""
     internal var showLoading: Boolean = true
     internal var forceLoading: Boolean = true
+    internal var handlerErrorAsEvent: Boolean = true
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
     fun onLoadingWithStep(onLoading: ((step: L?) -> Unit)? = null) {
@@ -133,21 +147,21 @@ class ResourceHandlerBuilder<L, D, E> {
  * 3. 网络请求发送错误，则提示用户请求错误。
  *
  * [State] 表示请求状态，每次状态变更，[LiveData] 都应该进行通知，该方法订阅 [LiveData] 并对各种状态进行处理。
- * 展示 loading 和对错误进行提示都是自动进行的，通常情况下，只需要提供 [ResourceHandlerBuilder.onSuccess] 对正常的网络结果进行处理即可。
- * 当然如果希望自己处理错误，则可以提供 [ResourceHandlerBuilder.onError] 回调。如果希望自己处理加载中的逻辑，则可以提供 [ResourceHandlerBuilder.onLoading] 回调。
+ * 展示 loading 和对错误进行提示都是自动进行的，通常情况下，只需要提供 [StateHandlerBuilder.onSuccess] 对正常的网络结果进行处理即可。
+ * 当然如果希望自己处理错误，则可以提供 [StateHandlerBuilder.onError] 回调。如果希望自己处理加载中的逻辑，则可以提供 [StateHandlerBuilder.onLoading] 回调。
  *
- * 另外需要注意的是：[ResourceHandlerBuilder.onSuccess] =  [ResourceHandlerBuilder.onData] + [ResourceHandlerBuilder.onNoData]，请根据你的偏好进行选择。
+ * 另外需要注意的是：[StateHandlerBuilder.onSuccess] =  [StateHandlerBuilder.onData] + [StateHandlerBuilder.onNoData]，请根据你的偏好进行选择。
  */
 fun <H, L, D, E> H.handleLiveData(
     data: LiveData<State<L, D, E>>,
-    handlerBuilder: ResourceHandlerBuilder<L, D, E>.() -> Unit,
+    handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val builder = ResourceHandlerBuilder<L, D, E>().apply {
+    val builder = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
 
     data.observe(this) { state ->
-        handleResourceInternal(state, builder)
+        handleStateInternal(state, builder)
     }
 }
 
@@ -155,14 +169,14 @@ fun <H, L, D, E> H.handleLiveData(
 fun <H, L, D, E> H.handleFlowWithLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
     data: Flow<State<L, D, E>>,
-    handlerBuilder: ResourceHandlerBuilder<L, D, E>.() -> Unit,
+    handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val builder = ResourceHandlerBuilder<L, D, E>().apply {
+    val builder = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
 
     collectFlowRepeatedlyOnLifecycle(activeState, data = data) {
-        handleResourceInternal(it, builder)
+        handleStateInternal(it, builder)
     }
 }
 
@@ -173,30 +187,30 @@ fun <H, L, D, E> H.handleFlowWithLifecycle(
 fun <H, L, D, E> H.handleFlowWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
     data: Flow<State<L, D, E>>,
-    handlerBuilder: ResourceHandlerBuilder<L, D, E>.() -> Unit,
+    handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : Fragment {
-    val builder = ResourceHandlerBuilder<L, D, E>().apply {
+    val builder = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
-    collectFlowRepeatedlyOnViewLifecycle(activeState,data= data){
-        handleResourceInternal(it, builder)
+    collectFlowRepeatedlyOnViewLifecycle(activeState, data = data) {
+        handleStateInternal(it, builder)
     }
 }
 
 /** refers to [handleLiveData] for details. */
-fun <H, L, D, E> H.handleResource(
+fun <H, L, D, E> H.handleState(
     state: State<L, D, E>,
-    handlerBuilder: ResourceHandlerBuilder<L, D, E>.() -> Unit,
+    handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val builder = ResourceHandlerBuilder<L, D, E>().apply {
+    val builder = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
-    handleResourceInternal(state, builder)
+    handleStateInternal(state, builder)
 }
 
-private fun <H, L, D, E> H.handleResourceInternal(
+private fun <H, L, D, E> H.handleStateInternal(
     state: State<L, D, E>,
-    handlerBuilder: ResourceHandlerBuilder<L, D, E>,
+    handlerBuilder: StateHandlerBuilder<L, D, E>,
 ) where H : LoadingViewHost, H : LifecycleOwner {
 
     when (state) {
@@ -219,7 +233,6 @@ private fun <H, L, D, E> H.handleResourceInternal(
 
         //----------------------------------------error start
         is Error -> {
-
             dismissLoadingDialogDelayed {
                 handlerBuilder.onLoadingEnd?.invoke()
 
@@ -229,7 +242,9 @@ private fun <H, L, D, E> H.handleResourceInternal(
                     }
                     handlerBuilder.onErrorState?.invoke(state.error, state.reason)
                 } else {
-                    showMessage(AndroidSword.errorConvert.convert(state.error))
+                    if (!state.isHandled || (state.isHandled && !handlerBuilder.handlerErrorAsEvent)) {
+                        showMessage(AndroidSword.errorConvert.convert(state.error))
+                    }
                 }
 
                 state.markAsHandled()
