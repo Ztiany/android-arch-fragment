@@ -14,12 +14,14 @@ import com.android.base.fragment.ui.RefreshView
 import com.android.base.fragment.ui.StateLayoutConfig
 import com.android.base.fragment.ui.StateLayoutConfig.RetryableState
 import com.android.base.fragment.ui.StateLayoutHost
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /**
  * 1. 支持显示 [CONTENT], [LOADING], [ERROR], [EMPTY] 等状态布局、支持下拉刷新。
  * 2. 使用的布局中必须有一个 id 为 [R.id.base_state_layout] 的 Layout，确保 Layout 实现了 [com.android.base.fragment.ui.StateLayout]。
  * 3. [RefreshView] (下拉刷新) 的视图 id 必须设置为  [R.id.base_refresh_layout]，没有添加则表示不需要下拉刷新功能。
  * 4. 默认所有重试和下拉刷新都会调用 [onRefresh]，子类可以修改该行为。
+ * 5. 详细用法请参考本模块的 README.md。
  *
  * 可以使用 [handleSateResource] 来处理加载到的数据。比如：
  *
@@ -65,7 +67,6 @@ import com.android.base.fragment.ui.StateLayoutHost
  * ```
  *
  * @author Ztiany
- * Date :   2016-03-19 23:09
  */
 abstract class BaseStateFragment<VB : ViewBinding> : BaseUIFragment<VB>(), StateLayoutHost {
 
@@ -91,6 +92,11 @@ abstract class BaseStateFragment<VB : ViewBinding> : BaseUIFragment<VB>(), State
     }
 
     protected open fun onRetry(@RetryableState state: Int) {
+        if (!internalRetryByAutoRefresh) {
+            onRefresh()
+            return
+        }
+
         if (stateLayoutHostImpl.isRefreshEnable) {
             if (!isRefreshing()) {
                 stateLayoutHostImpl.autoRefresh()

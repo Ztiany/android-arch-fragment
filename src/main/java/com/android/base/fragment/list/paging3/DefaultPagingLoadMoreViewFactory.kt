@@ -60,7 +60,7 @@ class DefaultPagingLoadMoreViewFactory : PagingLoadMoreViewFactory {
 
     override fun createPagingLoadMoreViewViewHolder(parent: ViewGroup, loadState: LoadState): PagingLoadMoreViewViewHolder {
         return DefaultPagingLoadMoreViewViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.base_layouer_paging_loader_more, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.base_layout_paging_load_more, parent, false)
         )
     }
 

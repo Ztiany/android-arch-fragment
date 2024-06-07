@@ -7,6 +7,7 @@ import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.StateLayoutConfig
 import com.android.base.fragment.ui.StateLayoutHost
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /**
  * @author Ztiany
@@ -36,6 +37,11 @@ abstract class BaseStateDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<
     }
 
     protected open fun onRetry(@StateLayoutConfig.RetryableState state: Int) {
+        if (!internalRetryByAutoRefresh) {
+            onRefresh()
+            return
+        }
+
         if (stateLayoutHostImpl.isRefreshEnable) {
             if (!isRefreshing()) {
                 stateLayoutHostImpl.autoRefresh()

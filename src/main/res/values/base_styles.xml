@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="BaseArchStyle" />
+    <style name="Widget.BaseArch" parent="" />
 
     <!--状态布局-->
-    <style name="BaseArchStyle.SimpleMultiStateLayout">
+    <style name="Widget.BaseArch.SimpleMultiStateLayout">
         <item name="android:id">@id/base_state_layout</item>
-        <item name="msl_viewState">content</item>
-
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
+
+        <item name="msl_viewState">content</item>
+        <item name="msl_emptyView">@layout/base_layout_empty</item>
+        <item name="msl_emptyText">@string/base_error_no_data</item>
+        <item name="msl_loadingView">@layout/base_layout_loading</item>
+        <item name="msl_requestingView">@layout/base_layout_loading</item>
 
         <item name="msl_errorImg">@drawable/base_img_error</item>
         <item name="msl_errorView">@layout/base_layout_error</item>
@@ -25,12 +29,6 @@
         <item name="msl_server_errorView">@layout/base_layout_server_error</item>
         <item name="msl_server_errorText">@string/base_error_server_error</item>
         <item name="msl_server_errorAction">@string/base_error_retry_action_tips</item>
-
-        <item name="msl_emptyView">@layout/base_layout_empty</item>
-        <item name="msl_emptyText">@string/base_error_no_data</item>
-
-        <item name="msl_loadingView">@layout/base_layout_loading</item>
-        <item name="msl_requestingView">@layout/base_layout_loading</item>
     </style>
 
 </resources>

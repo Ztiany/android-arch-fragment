@@ -14,6 +14,7 @@ import com.android.base.foundation.state.NoData
 import com.android.base.foundation.state.State
 import com.android.base.foundation.state.Success
 import com.android.base.fragment.ui.StateLayoutHost
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /** @see BaseStateFragment */
 typealias DataChecker<D> = (D) -> Boolean
@@ -43,7 +44,7 @@ class StateHandlerBuilder<L, D, E> {
     internal var onError: ((error: Throwable, reason: E?) -> Unit)? = null
     internal var onLoading: ((step: L?) -> Unit)? = null
 
-    internal var showContentLoadingWhenEmpty = false
+    internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
     internal var customErrorHandler = false
     internal var customEmptyHandler = false
@@ -116,6 +117,25 @@ fun <L, D, E> StateLayoutHost.handleSateResource(
 }
 
 /** @see BaseStateFragment */
+fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Boolean = false) {
+    if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
+        showLoadingLayout()
+    } else {
+        setRefreshing()
+    }
+}
+
+/** @see BaseStateFragment */
+fun <D> StateLayoutHost.handleStateData(
+    data: D?,
+    emptyChecker: DataChecker<D> = newDefaultChecker(),
+    onEmpty: (() -> Unit)? = null,
+    onResult: ((D) -> Unit)? = null,
+) {
+    handleStateData(data, emptyChecker, false, onEmpty, onResult)
+}
+
+/** @see BaseStateFragment */
 private fun <D> StateLayoutHost.handleStateData(
     data: D?,
     emptyChecker: DataChecker<D> = newDefaultChecker(),
@@ -136,25 +156,6 @@ private fun <D> StateLayoutHost.handleStateData(
         onResult?.invoke(data)
         showContentLayout()
     }
-}
-
-/** @see BaseStateFragment */
-fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Boolean = false) {
-    if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
-        showLoadingLayout()
-    } else {
-        setRefreshing()
-    }
-}
-
-/** @see BaseStateFragment */
-fun <D> StateLayoutHost.handleStateData(
-    data: D?,
-    emptyChecker: DataChecker<D> = newDefaultChecker(),
-    onEmpty: (() -> Unit)? = null,
-    onResult: ((D) -> Unit)? = null,
-) {
-    handleStateData(data, emptyChecker, false, onEmpty, onResult)
 }
 
 fun StateLayoutHost.handleStateError(throwable: Throwable) {

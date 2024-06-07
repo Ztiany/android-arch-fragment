@@ -3,6 +3,23 @@ package com.android.base.fragment.list
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.list.segment.BaseListFragment
 import com.android.base.fragment.ui.ListLayoutHost
+import com.android.base.fragment.ui.internalRetryByAutoRefresh
+
+/** @see BaseListFragment */
+fun ListLayoutHost<*>.handleListLoading(showContentLoadingWhenEmpty: Boolean = !internalRetryByAutoRefresh) {
+    if (isLoadingMore()) {
+        return
+    }
+    if (isEmpty()) {
+        if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
+            showLoadingLayout()
+        } else {
+            setRefreshing()
+        }
+    } else {
+        setRefreshing()
+    }
+}
 
 /** @see [BaseListFragment] */
 fun <D> ListLayoutHost<D>.handleListData(
@@ -63,18 +80,5 @@ fun ListLayoutHost<*>.handleListError(throwable: Throwable) {
         }
     } else {
         showContentLayout()
-    }
-}
-
-/** @see BaseListFragment */
-fun ListLayoutHost<*>.handleListLoading(showContentLoadingWhenEmpty: Boolean = false) {
-    if (isEmpty()) {
-        if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
-            showLoadingLayout()
-        } else {
-            setRefreshing()
-        }
-    } else {
-        setRefreshing()
     }
 }

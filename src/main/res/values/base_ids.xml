@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--重试 text-->
+    <!-- 错误描述 -->
     <item name="base_retry_tv" type="id" />
-    <!--重试 icon-->
+    <!-- 重试 icon -->
     <item name="base_retry_icon" type="id" />
-    <!--重试 btn-->
+    <!-- 重试 btn -->
     <item name="base_retry_btn" type="id" />
 
-    <item name="recycler_view" type="id" />
-
-    <!--刷新控件，如下拉刷新 SwipeRefreshLayout-->
+    <!-- 目标刷新控件，比如 ScrollChildSwipeRefreshLayout -->
     <item name="base_refresh_layout" type="id" />
-    <!--状态布局控件，如 multiStatusView-->
+
+    <!--状态布局控件，如 MultiStatusLayout -->
     <item name="base_state_layout" type="id" />
     <item name="base_tag_multi_state_view" type="id" />
 

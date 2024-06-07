@@ -109,7 +109,7 @@ class FragmentModuleConfig internal constructor() {
      *
      * ```
      * <com.android.base.fragment.widget.SimpleMultiStateLayout
-     *     style="@style/AppStyle.SimpleMultiStateLayout"
+     *     style="@style/Widget.App.SimpleMultiStateLayout"
      *     app:msl_viewState="loading"
      *     tools:msl_viewState="content">
      *
@@ -135,7 +135,7 @@ class FragmentModuleConfig internal constructor() {
      *         app:srl_target_id="@id/recycler_view">
      *
      *      <com.android.base.fragment.widget.SimpleMultiStateLayout
-     *          style="@style/AppStyle.SimpleMultiStateLayout"
+     *          style="@style/Widget.App.SimpleMultiStateLayout"
      *          app:msl_viewState="loading"
      *          tools:msl_viewState="content">
      *
