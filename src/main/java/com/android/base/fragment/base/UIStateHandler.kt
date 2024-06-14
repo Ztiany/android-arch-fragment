@@ -34,7 +34,7 @@ fun LoadingViewHost.dismissLoadingDialogDelayed(onDismiss: (() -> Unit)? = null)
 }
 
 /** Configure how to handle UI state [State]. */
-class StateHandlerBuilder<L, D, E> {
+class StateHandlerBuilder<L, D, E> internal constructor() {
 
     internal var onLoading: ((step: L?) -> Unit)? = null
     internal var onLoadingEnd: (() -> Unit)? = null

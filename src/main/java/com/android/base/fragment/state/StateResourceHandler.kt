@@ -36,7 +36,7 @@ private fun <D> newDefaultChecker(): ((D) -> Boolean) {
 }
 
 /** @see BaseStateFragment */
-class StateHandlerBuilder<L, D, E> {
+class StateHandlerBuilder<L, D, E> internal constructor(){
     internal var emptyChecker: DataChecker<D> = newDefaultChecker()
 
     internal var onEmpty: (() -> Unit)? = null
@@ -76,7 +76,7 @@ class StateHandlerBuilder<L, D, E> {
 }
 
 /** @see BaseStateFragment */
-fun <L, D, E> StateLayoutHost.handleSateResource(
+fun <L, D, E> StateLayoutHost.handleMultiState(
     state: State<L, D, E>,
     handler: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) {

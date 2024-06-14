@@ -23,7 +23,7 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
  * 4. 默认所有重试和下拉刷新都会调用 [onRefresh]，子类可以修改该行为。
  * 5. 详细用法请参考本模块的 README.md。
  *
- * 可以使用 [handleSateResource] 来处理加载到的数据。比如：
+ * 可以使用 [handleMultiState] 来处理加载到的数据。比如：
  *
  * ```kotlin
  * class ProtocolViewModel @Inject constructor(
@@ -55,7 +55,7 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
  *
  *     private fun subscribeViewModel() {
  *          viewModel.protocolContentState.observe(this) {
- *             handleSateResource(it) {
+ *             handleMultiState(it) {
  *                 onResult { data ->
  *                     vb.protocolView.setProtocol(data.content)
  *                 }
