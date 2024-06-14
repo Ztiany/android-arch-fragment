@@ -53,7 +53,7 @@ class StateHandlerBuilder<L, D, E> {
     internal var loadingMessage: CharSequence = ""
     internal var showLoading: Boolean = true
     internal var forceLoading: Boolean = true
-    internal var handlerErrorAsEvent: Boolean = true
+    internal var handlerErrorAsEvent: Boolean = false
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
     fun onLoadingWithStep(onLoading: ((step: L?) -> Unit)? = null) {
@@ -135,6 +135,11 @@ class StateHandlerBuilder<L, D, E> {
     /** indicate whether the loading dialog is cancelable. */
     fun forceLoading() {
         this.forceLoading = true
+    }
+
+    /** indicate that the error message just displays once. */
+    fun handlerErrorAsEvent() {
+        handlerErrorAsEvent = true
     }
 
 }
