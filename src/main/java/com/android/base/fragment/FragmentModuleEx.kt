@@ -103,15 +103,18 @@ class FragmentModuleConfig internal constructor() {
         }
         get() = internalDefaultPagingLoadMoreViewFactory
 
-
     /**
-     * set as false when your list layout is like this:
+     * set as false when your list layout is like the following.
+     * when you do retrying, onRefresh will be called but the RefreshLayout will not be triggered.
+     * then the SimpleMultiStateView is showing loading layout. Users can not trigger refresh by swipe.
+     * This can avoid the situation that the the SimpleMultiStateView is showing loading layout
+     * and the RefreshLayout is showing a refreshing state at the same time.
      *
      * ```
-     * <com.android.base.fragment.widget.SimpleMultiStateLayout
-     *     style="@style/Widget.App.SimpleMultiStateLayout"
-     *     app:msl_viewState="loading"
-     *     tools:msl_viewState="content">
+     * <com.android.base.fragment.widget.SimpleMultiStateView
+     *     style="@style/AppStyle.SimpleMultiStateView"
+     *     app:msv_viewState="loading"
+     *     tools:msv_viewState="content">
      *
      *     <com.android.base.fragment.widget.ScrollChildSwipeRefreshLayout
      *         style="@style/Widget.App.SwipeRefreshLayout"
@@ -124,27 +127,29 @@ class FragmentModuleConfig internal constructor() {
      *
      *     </com.android.base.fragment.widget.ScrollChildSwipeRefreshLayout>
      *
-     * </com.android.base.fragment.widget.SimpleMultiStateLayout>
+     * </com.android.base.fragment.widget.SimpleMultiStateView>
      * ```
      *
-     * set as true when your list layout is like this:
+     * set as true when your list layout is like the following.
+     * That means when you do retrying, onRefresh is triggered by the RefreshLayout.
+     * Then ScrollChildSwipeRefreshLayout is never showing a loading layout.
      *
      * ```
      * <com.android.base.fragment.widget.ScrollChildSwipeRefreshLayout
      *         style="@style/Widget.App.SwipeRefreshLayout"
      *         app:srl_target_id="@id/recycler_view">
      *
-     *      <com.android.base.fragment.widget.SimpleMultiStateLayout
-     *          style="@style/Widget.App.SimpleMultiStateLayout"
-     *          app:msl_viewState="loading"
-     *          tools:msl_viewState="content">
+     *      <com.android.base.fragment.widget.SimpleMultiStateView
+     *          style="@style/AppStyle.SimpleMultiStateView"
+     *          app:msv_viewState="loading"
+     *          tools:msv_viewState="content">
      *
      *         <androidx.recyclerview.widget;.RecyclerView
      *             android:id="@+id/recycler_view"
      *             android:layout_width="match_parent"
      *             android:layout_height="match_parent"/>
      *
-     *      </com.android.base.fragment.widget.SimpleMultiStateLayout>
+     *      </com.android.base.fragment.widget.SimpleMultiStateView>
      *
      * </com.android.base.fragment.widget.ScrollChildSwipeRefreshLayout>
      * ```

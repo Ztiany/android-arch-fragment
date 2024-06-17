@@ -16,10 +16,12 @@ import com.android.base.foundation.state.Success
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
-/** @see BaseStateFragment */
+/**
+ * return true if the data is empty.
+ */
 typealias DataChecker<D> = (D) -> Boolean
 
-private fun <D> newDefaultChecker(): ((D) -> Boolean) {
+internal fun <D> newDefaultChecker(): ((D) -> Boolean) {
     return { data ->
         (data is CharSequence && (data.isEmpty() || data.isBlank()))
                 || (data is Collection<*> && data.isEmpty())
@@ -36,7 +38,7 @@ private fun <D> newDefaultChecker(): ((D) -> Boolean) {
 }
 
 /** @see BaseStateFragment */
-class StateHandlerBuilder<L, D, E> internal constructor(){
+class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var emptyChecker: DataChecker<D> = newDefaultChecker()
 
     internal var onEmpty: (() -> Unit)? = null
@@ -46,18 +48,18 @@ class StateHandlerBuilder<L, D, E> internal constructor(){
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
-    internal var customErrorHandler = false
-    internal var customEmptyHandler = false
-    internal var customLoadingHandler = false
+    internal var monopolizedErrorHandler = false
+    internal var monopolizedEmptyHandler = false
+    internal var monopolizedLoadingHandler = false
 
     fun onEmpty(monopolized: Boolean = false, action: () -> Unit) {
         onEmpty = action
-        customEmptyHandler = monopolized
+        monopolizedEmptyHandler = monopolized
     }
 
     fun onError(monopolized: Boolean = false, action: (error: Throwable, reason: E?) -> Unit) {
         onError = action
-        customErrorHandler = monopolized
+        monopolizedErrorHandler = monopolized
     }
 
     fun onResult(action: (D) -> Unit) {
@@ -66,17 +68,22 @@ class StateHandlerBuilder<L, D, E> internal constructor(){
 
     fun onLoading(monopolized: Boolean = false, action: (step: L?) -> Unit) {
         onLoading = action
-        customLoadingHandler = monopolized
+        monopolizedLoadingHandler = monopolized
     }
 
-    fun useContentLoadingWhenEmpty() {
-        showContentLoadingWhenEmpty = true
+    /**
+     * Set as true then the content loading layout will be shown instead of showing the refresh indicator.
+     *
+     * see explanation in [internalRetryByAutoRefresh].
+     */
+    fun showContentLoadingWhenEmpty(enable: Boolean) {
+        showContentLoadingWhenEmpty = enable
     }
 
 }
 
 /** @see BaseStateFragment */
-fun <L, D, E> StateLayoutHost.handleMultiState(
+fun <L, D, E> StateLayoutHost.handleState(
     state: State<L, D, E>,
     handler: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) {
@@ -87,15 +94,15 @@ fun <L, D, E> StateLayoutHost.handleMultiState(
         is Idle -> {}
 
         is Loading -> {
-            if (!stateHandlerBuilder.customLoadingHandler) {
-                handleStateLoading(stateHandlerBuilder.showContentLoadingWhenEmpty)
+            if (!stateHandlerBuilder.monopolizedLoadingHandler) {
+                handleLoading(stateHandlerBuilder.showContentLoadingWhenEmpty)
             }
             stateHandlerBuilder.onLoading?.invoke(state.step)
         }
 
         is Error -> {
-            if (!stateHandlerBuilder.customErrorHandler) {
-                handleStateError(state.error)
+            if (!stateHandlerBuilder.monopolizedErrorHandler) {
+                handleError(state.error)
             }
             stateHandlerBuilder.onError?.invoke(state.error, state.reason)
         }
@@ -105,10 +112,10 @@ fun <L, D, E> StateLayoutHost.handleMultiState(
                 is NoData -> null
                 is Data<D> -> state.value
             }
-            handleStateData(
+            handleData(
                 data,
                 stateHandlerBuilder.emptyChecker,
-                stateHandlerBuilder.customEmptyHandler,
+                stateHandlerBuilder.monopolizedEmptyHandler,
                 stateHandlerBuilder.onEmpty,
                 stateHandlerBuilder.onResult
             )
@@ -117,7 +124,7 @@ fun <L, D, E> StateLayoutHost.handleMultiState(
 }
 
 /** @see BaseStateFragment */
-fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Boolean = false) {
+private fun StateLayoutHost.handleLoading(showContentLoadingWhenEmpty: Boolean = false) {
     if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
         showLoadingLayout()
     } else {
@@ -126,17 +133,7 @@ fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Boolean = fa
 }
 
 /** @see BaseStateFragment */
-fun <D> StateLayoutHost.handleStateData(
-    data: D?,
-    emptyChecker: DataChecker<D> = newDefaultChecker(),
-    onEmpty: (() -> Unit)? = null,
-    onResult: ((D) -> Unit)? = null,
-) {
-    handleStateData(data, emptyChecker, false, onEmpty, onResult)
-}
-
-/** @see BaseStateFragment */
-private fun <D> StateLayoutHost.handleStateData(
+private fun <D> StateLayoutHost.handleData(
     data: D?,
     emptyChecker: DataChecker<D> = newDefaultChecker(),
     monopolizedEmptyHandler: Boolean = false,
@@ -158,7 +155,7 @@ private fun <D> StateLayoutHost.handleStateData(
     }
 }
 
-fun StateLayoutHost.handleStateError(throwable: Throwable) {
+private fun StateLayoutHost.handleError(throwable: Throwable) {
     if (isRefreshEnable && isRefreshing()) {
         refreshCompleted()
     }

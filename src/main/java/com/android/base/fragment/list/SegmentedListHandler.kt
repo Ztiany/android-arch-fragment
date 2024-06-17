@@ -6,8 +6,14 @@ import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /** @see BaseListFragment */
-fun ListLayoutHost<*>.handleListLoading(showContentLoadingWhenEmpty: Boolean = !internalRetryByAutoRefresh) {
+fun ListLayoutHost<*>.handleListLoading(
+    cancelRefreshWhenLoadingMore: Boolean = true,
+    showContentLoadingWhenEmpty: Boolean = !internalRetryByAutoRefresh,
+) {
     if (isLoadingMore()) {
+        if (cancelRefreshWhenLoadingMore) {
+            refreshCompleted()
+        }
         return
     }
     if (isEmpty()) {

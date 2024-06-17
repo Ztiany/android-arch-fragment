@@ -17,14 +17,11 @@ import kotlinx.coroutines.launch
 
 /** A class used to model the state of a list. */
 data class ListState<T>(
-    /** 列表数据 */
     val data: List<T> = emptyList(),
 
-    // 刷新状态
     val isRefreshing: Boolean = false,
     val refreshError: Throwable? = null,
 
-    // 加载更多状态
     val isLoadingMore: Boolean = false,
     val loadMoreError: Throwable? = null,
     val hasMore: Boolean = false,
@@ -147,7 +144,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
     val listHandler = ListStateHandlerBuilder().apply(handlerBuilder)
 
     runRepeatedlyOnViewLifecycle(activeState) {
-        // 数据
+        // handing data
         launch {
             data.map { it.data }
                 .distinctUntilChanged()
@@ -155,7 +152,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
                     replaceData(it)
                 }
         }
-        // 刷新状态
+        // handle refresh state
         launch {
             data.map { Pair(it.isRefreshing, it.refreshError) }
                 .distinctUntilChanged()
@@ -163,7 +160,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
                     handleRefreshState(it, listHandler)
                 }
         }
-        // 加载更多状态
+        // handle loading more state
         launch {
             data.map { Triple(it.isLoadingMore, it.hasMore, it.loadMoreError) }
                 .distinctUntilChanged()
