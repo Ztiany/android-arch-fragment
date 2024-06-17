@@ -33,6 +33,16 @@ fun LoadingViewHost.dismissLoadingDialogDelayed(onDismiss: (() -> Unit)? = null)
     dismissLoadingDialog(AndroidSword.minimalDialogDisplayTime, onDismiss)
 }
 
+class ErrorHandingProcedure internal constructor(
+    private val defaultHanding: (() -> Unit)? = null,
+) {
+
+    fun continueDefaultProcedure() {
+        defaultHanding?.invoke()
+    }
+
+}
+
 /** Configure how to handle UI state [State]. */
 class StateHandlerBuilder<L, D, E> internal constructor() {
 
@@ -40,12 +50,14 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var onLoadingEnd: (() -> Unit)? = null
     internal var onIdle: (() -> Unit)? = null
 
-    internal var onError: ((error: Throwable, reason: E?) -> Unit)? = null
+    // act like an event
+    internal var onError: (ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccess: ((D?) -> Unit)? = null
     internal var onData: ((D) -> Unit)? = null
     internal var onNoData: (() -> Unit)? = null
 
-    internal var onErrorState: ((error: Throwable, reason: E?) -> Unit)? = null
+    // act like a state
+    internal var onErrorState: (ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccessState: ((D?) -> Unit)? = null
     internal var onDataState: ((D) -> Unit)? = null
     internal var onNoDataState: (() -> Unit)? = null
@@ -56,69 +68,71 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var handlerErrorAsEvent: Boolean = false
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
-    fun onLoadingWithStep(onLoading: ((step: L?) -> Unit)? = null) {
+    fun onLoadingWithStep(onLoading: (step: L?) -> Unit) {
         this.onLoading = onLoading
     }
 
     /** [onLoading] will be called once state is [Loading]. */
-    fun onLoading(onLoading: (() -> Unit)? = null) {
+    fun onLoading(onLoading: () -> Unit) {
         onLoadingWithStep {
-            onLoading?.invoke()
+            onLoading()
         }
     }
 
     /** [onLoadingEnd] will be called once state is not [Loading].. */
-    fun onLoadingEnd(onLoadingEnd: (() -> Unit)? = null) {
+    fun onLoadingEnd(onLoadingEnd: () -> Unit) {
         this.onLoadingEnd = onLoadingEnd
     }
 
     /** [onError] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onError(onErrorEvent: ((error: Throwable) -> Unit)? = null) {
-        onErrorWithReason { error, _ -> onErrorEvent?.invoke(error) }
+    fun onError(onErrorEvent: ErrorHandingProcedure.(error: Throwable) -> Unit) {
+        onErrorWithReason { error, _ ->
+            onErrorEvent(error)
+        }
     }
 
     /** [onErrorEventWithReason] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onErrorWithReason(onErrorEventWithReason: ((error: Throwable, reason: E?) -> Unit)? = null) {
+    fun onErrorWithReason(onErrorEventWithReason: ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onError = onErrorEventWithReason
     }
 
     /** [onErrorState] will be called once [State] is [Error]. */
-    fun onErrorState(onErrorState: ((error: Throwable) -> Unit)? = null) {
-        onErrorStateWithReason { error, _ -> onErrorState?.invoke(error) }
+    fun onErrorState(onErrorState: ErrorHandingProcedure.(error: Throwable) -> Unit) {
+        onErrorStateWithReason { error, _ -> onErrorState(error) }
     }
 
     /** [onErrorStateWithReason] will be called once [State] is [Error]. */
-    fun onErrorStateWithReason(onErrorStateWithReason: ((error: Throwable, reason: E?) -> Unit)? = null) {
+    fun onErrorStateWithReason(onErrorStateWithReason: ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onErrorState = onErrorStateWithReason
     }
 
     /** [onSuccess] will always be called when [State] is [Success] and is not handled. It behaves like an event. */
-    fun onSuccess(onSuccessEvent: ((D?) -> Unit)? = null) {
+    fun onSuccess(onSuccessEvent: (D?) -> Unit) {
         this.onSuccess = onSuccessEvent
     }
 
     /** [onData] will be called only when [State] is [Data] and is not handled. It behaves like an event. It behaves like an event. */
-    fun onData(onDataEvent: ((D) -> Unit)? = null) {
+    fun onData(onDataEvent: (D) -> Unit) {
         this.onData = onDataEvent
     }
 
     /** [onNoData] will be called only when [State] is [NoData] and is not handled. It behaves like an event. */
-    fun onNoData(onNoDataEvent: (() -> Unit)? = null) {
+    fun onNoData(onNoDataEvent: () -> Unit) {
         this.onNoData = onNoDataEvent
     }
 
     /** [onSuccessState] will always be called once [State] is [Success]. */
-    fun onSuccessState(onSuccessState: ((D?) -> Unit)? = null) {
+    fun onSuccessState(onSuccessState: (D?) -> Unit) {
         this.onSuccess = onSuccessState
     }
 
     /** [onDataState] will be called only when [State] is [Data]. */
-    fun onDataState(onDataState: ((D) -> Unit)? = null) {
+    fun onDataState(onDataState: (D) -> Unit) {
         this.onData = onDataState
     }
 
     /** [onDataState] will be called only when [State] is [NoData]. */
-    fun onNoDataState(onNoDataState: (() -> Unit)? = null) {
+    fun onNoDataState(onNoDataState: () -> Unit) {
         this.onNoData = onNoDataState
     }
 
@@ -242,10 +256,11 @@ private fun <H, L, D, E> H.handleStateInternal(
                 handlerBuilder.onLoadingEnd?.invoke()
 
                 if (handlerBuilder.onError != null || handlerBuilder.onErrorState != null) {
+                    val procedure = ErrorHandingProcedure { showMessage(AndroidSword.errorConvert.convert(state.error)) }
                     if (!state.isHandled) {
-                        handlerBuilder.onError?.invoke(state.error, state.reason)
+                        handlerBuilder.onError?.invoke(procedure, state.error, state.reason)
                     }
-                    handlerBuilder.onErrorState?.invoke(state.error, state.reason)
+                    handlerBuilder.onErrorState?.invoke(procedure, state.error, state.reason)
                 } else {
                     if (!state.isHandled || (state.isHandled && !handlerBuilder.handlerErrorAsEvent)) {
                         showMessage(AndroidSword.errorConvert.convert(state.error))
