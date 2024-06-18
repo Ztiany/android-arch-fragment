@@ -3,6 +3,7 @@ package com.android.base.fragment.state
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
+import timber.log.Timber
 
 interface DataState<T> {
     val data: T?
@@ -21,8 +22,8 @@ class DataStateHandlerBuilder<D> internal constructor() {
     internal var emptyChecker: DataChecker<D> = newDefaultChecker()
 
     internal var onEmpty: (() -> Unit)? = null
-    internal var onResult: ((data: D) -> Unit)? = null
-    internal var onError: ((error: Throwable) -> Unit)? = null
+    internal var onResult: ((D) -> Unit)? = null
+    internal var onError: ((error: Throwable, isEmpty: Boolean) -> Unit)? = null
     internal var onLoading: ((isEmpty: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
@@ -36,7 +37,7 @@ class DataStateHandlerBuilder<D> internal constructor() {
         monopolizedEmptyHandler = monopolized
     }
 
-    fun onError(monopolized: Boolean = false, action: (error: Throwable) -> Unit) {
+    fun onError(monopolized: Boolean = false, action: (error: Throwable, isEmpty: Boolean) -> Unit) {
         onError = action
         monopolizedErrorHandler = monopolized
     }
@@ -56,7 +57,44 @@ class DataStateHandlerBuilder<D> internal constructor() {
 
 }
 
-/** @see BaseStateFragment */
+
+/**
+ * Like its name "Retained State", we should handle the state in a retained way. Your code may be
+ * like this:
+ *
+ * ```
+ *@HiltViewModel
+ * class TerminalListViewModel @Inject constructor(
+ *     private val deviceRepository: DeviceRepository,
+ *     private val dataMapper: ListVOMapper,
+ * ) : ViewModel() {
+ *
+ *     @OptIn(ExperimentalCoroutinesApi::class)
+ *     private val terminalList = selectedMerchant
+ *         .flatMapMerge (1){
+ *             loadTerminalList1(it.merchant)
+ *         }.runningFold(SimpleDataState<List<Any>>(isRefreshing = true)) { accumulator, value ->
+ *             // always dispatch the latest data
+ *             if (value.data == null) {
+ *                 value.copy(accumulator.data)
+ *             } else value
+ *         }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+ *
+ *     private fun loadTerminalList1(selected: Merchant) = flow<SimpleDataState<List<Any>>> {
+ *         emit(SimpleDataState(isRefreshing = true))
+ *         deviceRepository.loadMerchantList(getSelectMerchantIdList(selected))
+ *             .onSuccess {
+ *                 emit(SimpleDataState(data = dataMapper.map(it)))
+ *             }
+ *             .onError {
+ *                 emit(SimpleDataState(refreshError = it))
+ *             }
+ *     }
+ *}
+ * ```
+ *
+ * @see BaseStateFragment
+ */
 fun <D> StateLayoutHost.handleDataState(
     state: DataState<D>,
     handler: DataStateHandlerBuilder<D>.() -> Unit,
@@ -71,6 +109,7 @@ fun <D> StateLayoutHost.handleDataState(
             showContentLayout()
         }
     }
+
     val isEmpty = data == null || stateHandler.emptyChecker(data)
     val error = state.refreshError
 
@@ -83,7 +122,6 @@ fun <D> StateLayoutHost.handleDataState(
                 setRefreshing()
             }
         }
-
         stateHandler.onLoading?.invoke(isEmpty)
         // always dispatch data if we have.
         dispatchData()
@@ -109,8 +147,8 @@ fun <D> StateLayoutHost.handleDataState(
 
     error?.let {
         // always dispatch error.
-        stateHandler.onError?.invoke(it)
-        if (stateHandler.monopolizedErrorHandler && !isEmpty) {
+        stateHandler.onError?.invoke(it, isEmpty)
+        if (stateHandler.monopolizedErrorHandler || !isEmpty) {
             return
         }
 

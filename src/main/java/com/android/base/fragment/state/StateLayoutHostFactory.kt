@@ -68,7 +68,6 @@ fun buildStateLayoutHost(
             }
 
         override fun showContentLayout() {
-            refreshCompleted()
             stateLayoutImpl.showContentLayout()
         }
 
@@ -77,12 +76,10 @@ fun buildStateLayoutHost(
         }
 
         override fun showEmptyLayout() {
-            refreshCompleted()
             stateLayoutImpl.showEmptyLayout()
         }
 
         override fun showErrorLayout() {
-            refreshCompleted()
             stateLayoutImpl.showErrorLayout()
         }
 
@@ -95,12 +92,10 @@ fun buildStateLayoutHost(
         }
 
         override fun showNetErrorLayout() {
-            refreshCompleted()
             stateLayoutImpl.showNetErrorLayout()
         }
 
         override fun showServerErrorLayout() {
-            refreshCompleted()
             stateLayoutImpl.showServerErrorLayout()
         }
 
