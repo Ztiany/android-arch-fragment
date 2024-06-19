@@ -23,9 +23,14 @@ class FragmentInfo(
         createdFragment = fragment
     }
 
-    fun newFragment(context: Context): Fragment {
+    @JvmOverloads
+    fun newFragment(context: Context, catchIt: Boolean = true): Fragment {
         // It is not necessary to use FragmentFactory all the time.
-        return Fragment.instantiate(context, clazz.getName(), arguments)
+        return Fragment.instantiate(context, clazz.getName(), arguments).apply {
+            if (catchIt) {
+                setInstance(this)
+            }
+        }
     }
 
 }

@@ -3,6 +3,8 @@ package com.android.base.fragment.ui
 import android.app.Dialog
 import androidx.annotation.StringRes
 
+interface Message
+
 /**
  *  A host interface for displaying loading dialog and messages.
  *
@@ -39,5 +41,3 @@ interface LoadingViewHost {
     fun showMessage(message: Message)
 
 }
-
-interface Message

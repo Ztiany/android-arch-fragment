@@ -143,8 +143,7 @@ public abstract class TabManager {
         if (fragment != null) {
             showOrAttach(fragmentTransaction, fragment);
         } else {
-            Fragment newFragment = fragmentInfo.newFragment(mContext);
-            fragmentInfo.setInstance(newFragment);
+            Fragment newFragment = fragmentInfo.newFragment(mContext, true);
             onFragmentCreated(fragmentId, newFragment);
             fragmentTransaction.add(mContainerId, newFragment, fragmentInfo.getTag());
         }
