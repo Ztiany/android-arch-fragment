@@ -15,7 +15,10 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
 
-/** This ListFragment works with [epoxy](https://github.com/airbnb/epoxy). You can use [handleListStateWithViewLifecycle] to handle received list data. */
+/**
+ * This ListFragment works with [epoxy](https://github.com/airbnb/epoxy).
+ * You should use [handleListStateWithViewLifecycle] to handle received list data.
+ */
 abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), ListLayoutHost<T> {
 
     private var loadMoreImpl: LoadMoreController? = null

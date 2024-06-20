@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * This extension is used to help [BasePagingFragment] or [BasePagingDialogFragment] handle paging data.
+ */
 fun <H, T : Any> H.handlePagingDataWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
     adapter: PagingDataAdapter<T, *>,
@@ -37,7 +40,7 @@ private fun PagingHost.handleLoadState(adapter: PagingDataAdapter<*, *>, loadSta
     handlePagingRefreshState(loadStates.refresh, isEmpty)
 }
 
-fun PagingHost.handlePagingRefreshState(
+private fun PagingHost.handlePagingRefreshState(
     refreshState: LoadState,
     isEmpty: Boolean,
     showContentLoadingWhenEmpty: Boolean = true,

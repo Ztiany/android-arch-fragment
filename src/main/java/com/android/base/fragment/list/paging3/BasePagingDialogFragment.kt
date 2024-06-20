@@ -2,7 +2,6 @@ package com.android.base.fragment.list.paging3
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.state.buildStateLayoutHost
@@ -12,8 +11,9 @@ import com.android.base.fragment.ui.StateLayoutConfig
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
+
 /**
- * A [Fragment] works with paging3.
+ *  @see BasePagingFragment
  */
 abstract class BasePagingDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<VB>(), PagingHost {
 

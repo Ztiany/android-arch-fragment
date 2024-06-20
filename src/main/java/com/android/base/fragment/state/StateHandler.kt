@@ -37,7 +37,7 @@ internal fun <D> newDefaultChecker(): ((D) -> Boolean) {
     }
 }
 
-/** @see BaseStateFragment */
+/** @see handleDataState */
 class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var emptyChecker: DataChecker<D> = newDefaultChecker()
 
@@ -82,7 +82,54 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
 
 }
 
-/** @see BaseStateFragment */
+/**
+ * This extension function facilitates state management for components like [BaseStateFragment] or [BaseStateDialogFragment].
+ *
+ * > Note: With the introduction of [handleDataState], usage of this extension is discouraged.
+ *
+ * Example usage:
+ *
+ * ```
+ * class ProtocolViewModel @Inject constructor(
+ *       private val repository: ProtocolRepository,
+ *       savedStateHandle: SavedStateHandle
+ * ) : ViewModel() {
+
+ *       private val _protocolContentState = MutableLiveData<StateD<ProtocolData>>()
+ *       val protocolContentState: LiveData<StateD<ProtocolData>> = _protocolContentState
+
+ *       init {
+ *          loadProtocolContent()
+ *       }
+
+ *       fun loadProtocolContent() {
+ *              _protocolContentState.setLoading()
+ *              viewModelScope.launch {
+ *                      try {
+ *                         _protocolContentState.setData(repository.loadProtocolContent(protocolCode))
+ *                      } catch (e: XXXException) {
+ *                         _protocolContentState.setError(e)
+ *                      }
+ *              }
+ *       }
+ *
+ * }
+ *
+ * class ProtocolFragment : BaseStateFragment<ProtocolFragmentBinding>() {
+ *
+ *     private fun subscribeViewModel() {
+ *          viewModel.protocolContentState.observe(this) {
+ *             handleDataState(it) {
+ *                 onResult { data ->
+ *                     vb.protocolView.setProtocol(data.content)
+ *                 }
+ *             }
+ *          }
+ *      }
+ *
+ * }
+ * ```
+ */
 fun <L, D, E> StateLayoutHost.handleState(
     state: State<L, D, E>,
     handler: StateHandlerBuilder<L, D, E>.() -> Unit,

@@ -3,6 +3,7 @@ package com.android.base.fragment.list
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.android.base.core.AndroidSword
+import com.android.base.fragment.list.epoxy.BaseEpoxyListFragment
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListLayoutHost
@@ -104,7 +105,7 @@ class ListStateHelper<T>(
 
 }
 
-class ListStateHandlerBuilder {
+class ListStateHandlerBuilder internal constructor() {
     internal var onEmpty: (() -> Unit)? = null
     internal var onError: ((isRefresh: Boolean, error: Throwable) -> Unit)? = null
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
@@ -126,6 +127,9 @@ class ListStateHandlerBuilder {
     }
 }
 
+/**
+ * @see BaseEpoxyListFragment
+ */
 fun <H, T> H.handleListStateWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
     data: Flow<ListState<T>>,
@@ -135,6 +139,9 @@ fun <H, T> H.handleListStateWithViewLifecycle(
     }
 }
 
+/**
+ * @see BaseEpoxyListFragment
+ */
 fun <H, T> H.handleListStateWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
     data: Flow<ListState<T>>,

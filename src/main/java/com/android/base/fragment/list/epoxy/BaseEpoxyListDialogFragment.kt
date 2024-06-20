@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIDialogFragment
-import com.android.base.fragment.list.handleListStateWithViewLifecycle
 import com.android.base.fragment.list.segment.buildListLayoutHost
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
@@ -15,7 +14,9 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
 
-/** This ListFragment works with epoxy. Only use [handleListStateWithViewLifecycle] to handle received list data. */
+/**
+ * @see BaseEpoxyListFragment
+ */
 abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
 
     private var loadMoreImpl: LoadMoreController? = null

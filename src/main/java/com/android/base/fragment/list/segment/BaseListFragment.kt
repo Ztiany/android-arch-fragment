@@ -11,7 +11,10 @@ import com.android.base.adapter.DataManager
 import com.android.base.adapter.recycler.segment.BaseRecyclerAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.list.epoxy.BaseEpoxyListFragment
 import com.android.base.fragment.list.handleListData
+import com.android.base.fragment.list.paging3.BasePagingFragment
+import com.android.base.fragment.state.BaseStateFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
@@ -22,14 +25,16 @@ import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
 
 /**
- * 通用的基于 RecyclerView 的列表界面，支持下拉刷新和加载更多。其一般的使用方式如下：
+ * A generic base fragment for managing RecyclerView-based list interfaces with support for pull-to-refresh and infinite scrolling.
+ * Usage of this fragment involves:
  *
- * 1. 列表数据由 [DataManager] 来管理，[DataManager] 一般是由 Adapter 实现，比如 [BaseRecyclerAdapter]；
- * 2. 在 [BaseListFragment] 中通过 [lifecycleScope] 来分段加载数据，然后累加到 [DataManager]  中；
- * 3. 在 [BaseListFragment] 被销毁重建（因配置发送改变）后，所有的 UI 状态和已经加载的数据都会被重置，未完成的加载也会被取消。
- * 4. 所有对列表的 Item 的操作，都在 [DataManager] 中进行。
+ * 1. Managing list data through a [DataManager], typically implemented by the adapter such as [BaseRecyclerAdapter].
+ * 2. Utilizing [lifecycleScope] within [BaseListFragment] to load data in segments, incrementally updating the [DataManager].
+ * 3. Upon destruction and recreation of [BaseListFragment] due to configuration changes, all UI states and loaded data are reset,
+ *    and ongoing loading operations are cancelled.
+ * 4. All operations related to list items are performed within the [DataManager].
  *
- * 以上是典型的命令式编程，适合**分段式**提交列表数据，可以使用 [handleListData] 来处理列表数据。比如：
+ * This approach is suitable for imperative programming with segmented data submission. you can use [handleListData] for data list processing, for example:
  *
  * ```kotlin
  *     class RecordsViewModel constructor(
@@ -67,12 +72,16 @@ import kotlin.properties.Delegates
  *    }
  * ```
  *
- * 但是由于分段加载分段提交的方式的局限性，以上方式并没有利用到 [ViewModel] 的特性，如果想要采用类似 Paging3 架构的那种的
- * 方式，列表数据放在 [ViewModel] 中管理，每次都全量提交数据，由框架本身来通知列表刷新（即完全使用数据驱动 UI），则可以
- * 使用 [fragment-epoxy] 模块。
+ * However, due to the limitations of segmented loading and submission, this method does not fully utilize the features of [ViewModel].
+ * For a more sophisticated approach resembling the Paging3 architecture, where list data is managed within the [ViewModel] and fully submitted
+ * each time to drive UI updates based on data, consider using the [BasePagingFragment] or [BaseEpoxyListFragment].
  *
- * @param <T> 当前列表使用的数据类型。
+ * Note: the layout requirements are the same as requirements of [BaseStateFragment].
+ *
+ * @param T The type of data used in the current list.
+ * @param VB The ViewBinding type associated with the fragment.
  * @author Ztiany
+ * @see BaseStateFragment
  */
 abstract class BaseListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), ListLayoutHost<T> {
 

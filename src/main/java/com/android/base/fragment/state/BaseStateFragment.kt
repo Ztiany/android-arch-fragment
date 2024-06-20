@@ -17,54 +17,15 @@ import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /**
- * 1. 支持显示 [CONTENT], [LOADING], [ERROR], [EMPTY] 等状态布局、支持下拉刷新。
- * 2. 使用的布局中必须有一个 id 为 [R.id.base_state_layout] 的 Layout，确保 Layout 实现了 [com.android.base.fragment.ui.StateLayout]。
- * 3. [RefreshView] (下拉刷新) 的视图 id 必须设置为  [R.id.base_refresh_layout]，没有添加则表示不需要下拉刷新功能。
- * 4. 默认所有重试和下拉刷新都会调用 [onRefresh]，子类可以修改该行为。
- * 5. 详细用法请参考本模块的 README.md。
+ * BaseStateFragment is a Fragment that manages various states such as [CONTENT], [LOADING], [ERROR], and [EMPTY],
+ * along with support for pull-to-refresh functionality, designed to be displayed in a StateLayout-enabled ViewGroup
+ * with the ID [R.id.base_state_layout]. The ViewGroup must implement [com.android.base.fragment.ui.StateLayout].
+ * Additionally, if your layout includes a [RefreshView] for pull-to-refresh, its ID must be set to [R.id.base_refresh_layout].
+ * Omitting the RefreshView indicates no pull-to-refresh functionality is needed. By default, both retry attempts and
+ * pull-to-refresh actions invoke the [onRefresh] method, which can be overridden by subclasses. For detailed usage,
+ * refer to the README.md of this module.
  *
- * 可以使用 [handleState] 来处理加载到的数据。比如：
- *
- * ```kotlin
- * class ProtocolViewModel @Inject constructor(
- *       private val repository: ProtocolRepository,
- *       savedStateHandle: SavedStateHandle
- * ) : ViewModel() {
-
- *       private val _protocolContentState = MutableLiveData<StateD<ProtocolData>>()
- *       val protocolContentState: LiveData<StateD<ProtocolData>> = _protocolContentState
-
- *       init {
- *          loadProtocolContent()
- *       }
-
- *       fun loadProtocolContent() {
- *              _protocolContentState.setLoading()
- *              viewModelScope.launch {
- *                      try {
- *                         _protocolContentState.setData(repository.loadProtocolContent(protocolCode))
- *                      } catch (e: XXXException) {
- *                         _protocolContentState.setError(e)
- *                      }
- *              }
- *       }
- *
- * }
- *
- * class ProtocolFragment : BaseStateFragment<ProtocolFragmentBinding>() {
- *
- *     private fun subscribeViewModel() {
- *          viewModel.protocolContentState.observe(this) {
- *             handleState(it) {
- *                 onResult { data ->
- *                     vb.protocolView.setProtocol(data.content)
- *                 }
- *             }
- *          }
- *      }
- *
- * }
- * ```
+ * Use [handleState] or [handleDataState] to manage your loaded data states.
  *
  * @author Ztiany
  */

@@ -2,22 +2,32 @@ package com.android.base.fragment.list.segment
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.android.base.fragment.base.BaseUIFragment
+import com.android.base.fragment.state.BaseStateFragment
 import com.android.base.fragment.ui.CommonId
 import com.android.base.fragment.ui.ListDataHost
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.Paging
+import com.android.base.fragment.ui.RefreshLoadMoreView
 import com.android.base.fragment.ui.StateLayoutConfig
 import kotlin.properties.Delegates
 
 /**
- *  [BaseListFragment] 只能支持 RecyclerView。因为 [BaseListFragment] 采用包装 [androidx.recyclerview.widget.RecyclerView.Adapter] 的方式，在底
- *  部添加 load more item 来实现加载更多。[BaseList2Fragment] 没有采用此种方式，所以你使用的 RefreshView 应该是同时支持下拉刷新和加载更多功能的。
+ * A versatile base fragment for managing list interfaces using [RefreshLoadMoreView], supporting both pull-to-refresh and infinite scrolling.
+ * Unlike [BaseListFragment], which wraps a [RecyclerView.Adapter] to implement its functionality, [BaseList2Fragment] provides flexibility by not being restricted
+ * to any specific view type.
  *
- *  在使用方式上，依然只适用于**分段式**提交列表数据的方式，具体参考 [BaseListFragment]。
+ * Usage remains suitable for segmented data submission, similar to [BaseListFragment].
  *
- *@author Ztiany
+ * Note: the layout requirements are the same as requirements of [BaseStateFragment].
+ *
+ * @param T The type of data used in the current list.
+ * @param VB The ViewBinding type associated with the fragment.
+ * @author Ztiany
+ * @see BaseListFragment
+ * @see BaseStateFragment
  */
 abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), ListLayoutHost<T> {
 

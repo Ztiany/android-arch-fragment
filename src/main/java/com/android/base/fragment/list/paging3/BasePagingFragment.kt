@@ -13,7 +13,7 @@ import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /**
- * A [Fragment] works with paging3.
+ * A [Fragment] works with paging3. use [handlePagingDataWithViewLifecycle] to manage you loaded data.
  */
 abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>(), PagingHost {
 

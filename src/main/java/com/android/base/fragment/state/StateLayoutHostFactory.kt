@@ -8,7 +8,7 @@ import com.android.base.fragment.ui.StateLayout
 import com.android.base.fragment.ui.StateLayoutConfig
 import com.android.base.fragment.ui.StateLayoutHost
 
-class StateLayoutHostConfig {
+class StateLayoutHostConfig internal constructor(){
     var onRetry: ((state: Int) -> Unit)? = null
     var onRefresh: (() -> Unit)? = null
 }
