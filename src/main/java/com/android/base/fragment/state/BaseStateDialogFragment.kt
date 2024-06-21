@@ -31,11 +31,6 @@ abstract class BaseStateDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        refreshCompleted()
-    }
-
     protected open fun onRetry(@StateLayoutConfig.RetryableState state: Int) {
         if (!internalRetryByAutoRefresh) {
             onRefresh()

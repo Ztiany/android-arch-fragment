@@ -59,11 +59,6 @@ abstract class BaseList2DialogFragment<T, VB : ViewBinding> : BaseUIDialogFragme
 
     protected open fun onLoadMore() {}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        refreshCompleted()
-    }
-
     override fun replaceData(data: List<T>) {
         listLayoutHostImpl.replaceData(data)
     }

@@ -47,11 +47,6 @@ abstract class BaseStateFragment<VB : ViewBinding> : BaseUIFragment<VB>(), State
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        refreshCompleted()
-    }
-
     protected open fun onRetry(@RetryableState state: Int) {
         if (!internalRetryByAutoRefresh) {
             onRefresh()

@@ -73,11 +73,6 @@ abstract class BaseList2Fragment<T, VB : ViewBinding> : BaseUIFragment<VB>(), Li
 
     protected open fun onLoadMore() {}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        refreshCompleted()
-    }
-
     override fun replaceData(data: List<T>) {
         listLayoutHostImpl.replaceData(data)
     }

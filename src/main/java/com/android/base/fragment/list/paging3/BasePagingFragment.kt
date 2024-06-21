@@ -33,11 +33,6 @@ abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>(), Pagi
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        refreshCompleted()
-    }
-
     protected open fun onRetry(@StateLayoutConfig.RetryableState state: Int) {
         if (!internalRetryByAutoRefresh) {
             onRefresh()
