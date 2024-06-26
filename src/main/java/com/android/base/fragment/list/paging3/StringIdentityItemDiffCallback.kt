@@ -3,7 +3,9 @@ package com.android.base.fragment.list.paging3
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 
 class StringIdentityItemDiffCallback<T : StringIdentity>(
-    private val areTheItemsSame: (T, T) -> Boolean = { old, new -> old.id == new.id },
+    private val areTheItemsSame: (T, T) -> Boolean = { old, new ->
+        old::class == new::class && old.id == new.id
+    },
     private val areTheContentsSame: (T, T) -> Boolean = { old, new -> old == new },
     private val getChangedPayload: (T, T) -> Any? = { _: StringIdentity, _: StringIdentity -> null },
 ) : ItemCallback<T>() {

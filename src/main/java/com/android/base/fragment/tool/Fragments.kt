@@ -23,7 +23,7 @@ import com.android.base.delegate.fragment.FragmentDelegateOwner
 annotation class UsingFragmentClassNameAsFlag
 
 @JvmOverloads
-fun Fragment.exitFragment(immediate: Boolean = false) {
+fun Fragment.exit(immediate: Boolean = false) {
     activity.exitFragment(immediate)
 }
 

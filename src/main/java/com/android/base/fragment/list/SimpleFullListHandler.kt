@@ -107,19 +107,25 @@ class ListStateHelper<T>(
 
 class ListStateHandlerBuilder internal constructor() {
     internal var onEmpty: (() -> Unit)? = null
-    internal var onError: ((isRefresh: Boolean, error: Throwable) -> Unit)? = null
+    internal var onRefreshError: ((isEmpty: Boolean, error: Throwable) -> Unit)? = null
+    internal var onLoadMoreError: ((error: Throwable) -> Unit)? = null
+    internal var onLoadMoreCompleted: ((reachedEnd: Boolean) -> Unit)? = null
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
-    internal var customErrorHandler = false
-    internal var customEmptyHandler = false
+    internal var monopolizedErrorHandler = false
+    internal var monopolizedEmptyHandler = false
 
     fun onEmpty(monopolized: Boolean = false, action: () -> Unit) {
         onEmpty = action
-        customEmptyHandler = monopolized
+        monopolizedEmptyHandler = monopolized
     }
 
-    fun onError(monopolized: Boolean = false, action: (isRefresh: Boolean, error: Throwable) -> Unit) {
-        onError = action
-        customErrorHandler = monopolized
+    fun onRefreshError(monopolized: Boolean = false, action: (isEmpty: Boolean, error: Throwable) -> Unit) {
+        onRefreshError = action
+        monopolizedErrorHandler = monopolized
+    }
+
+    fun onLoadMoreError(action: (error: Throwable) -> Unit) {
+        onLoadMoreError = action
     }
 
     fun showContentLoadingWhenEmpty(enable: Boolean) {
@@ -159,7 +165,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
                     replaceData(it)
                 }
         }
-        // handle refresh state
+        // handing refresh state
         launch {
             data.map { Pair(it.isRefreshing, it.refreshError) }
                 .distinctUntilChanged()
@@ -167,7 +173,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
                     handleRefreshState(it, listHandler)
                 }
         }
-        // handle loading more state
+        // handing load more state
         launch {
             data.map { Triple(it.isLoadingMore, it.hasMore, it.loadMoreError) }
                 .distinctUntilChanged()
@@ -193,10 +199,11 @@ private fun <T> ListLayoutHost<T>.handleRefreshState(
         refreshCompleted()
     }
 
-    // finished with error
+    // finished with an error
     val refreshError = refreshState.second
     if (refreshError != null) {
-        if (!listStateHandler.customErrorHandler) {
+        // default handing process
+        if (!listStateHandler.monopolizedErrorHandler) {
             if (isEmpty()) {
                 val errorTypeClassifier = AndroidSword.errorClassifier
                 if (errorTypeClassifier != null) {
@@ -212,7 +219,8 @@ private fun <T> ListLayoutHost<T>.handleRefreshState(
                 showContentLayout()
             }
         }
-        listStateHandler.onError?.invoke(true, refreshError)
+        // your custom handing process
+        listStateHandler.onRefreshError?.invoke(isEmpty(), refreshError)
         return
     }
 
@@ -222,16 +230,22 @@ private fun <T> ListLayoutHost<T>.handleRefreshState(
 
     // finished with no error
     if (isEmpty() && !isRefreshing()) {
-        if (!listStateHandler.customEmptyHandler) {
+        // default handing process
+        if (!listStateHandler.monopolizedEmptyHandler) {
             showEmptyLayout()
         }
+        // your custom handing process
         listStateHandler.onEmpty?.invoke()
     } else {
         showContentLayout()
     }
 }
 
-private fun <T> ListLayoutHost<T>.handleLoadingMoreState(loadMoreState: Triple<Boolean, Boolean, Throwable?>, listHandler: ListStateHandlerBuilder) {
+private fun <T> ListLayoutHost<T>.handleLoadingMoreState(
+    /* Triple<LoadingMore, hasMore, loadMoreError> */
+    loadMoreState: Triple<Boolean, Boolean, Throwable?>,
+    listHandler: ListStateHandlerBuilder,
+) {
     val loadMoreError = loadMoreState.third
     if (loadMoreState.first) {
         setLoadingMore()
@@ -239,8 +253,9 @@ private fun <T> ListLayoutHost<T>.handleLoadingMoreState(loadMoreState: Triple<B
     }
     if (loadMoreError != null) {
         loadMoreFailed()
-        listHandler.onError?.invoke(false, loadMoreError)
+        listHandler.onLoadMoreError?.invoke(loadMoreError)
     } else {
         loadMoreCompleted(loadMoreState.second)
+        listHandler.onLoadMoreCompleted?.invoke(!loadMoreState.second)
     }
 }
