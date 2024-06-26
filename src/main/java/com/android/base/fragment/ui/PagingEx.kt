@@ -35,7 +35,7 @@ fun calculatePageNumber(total: Int, pagingSize: Int, pagingStart: Int): Int {
         }
     }
     Timber.d(
-        "calculatePageNumber: total=%d, start=%d, size=%d, current=%d, next = %d",
+        "calculatePageNumber: total=%d, start=%d, size=%d, current=%d, next=%d",
         total,
         pagingStart,
         pagingSize,

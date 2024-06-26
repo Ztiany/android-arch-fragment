@@ -16,47 +16,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** A class used to model the state of a list. */
-data class ListState<T>(
-    val data: List<T> = emptyList(),
-
-    val isRefreshing: Boolean = false,
-    val refreshError: Throwable? = null,
-
-    val isLoadingMore: Boolean = false,
-    val loadMoreError: Throwable? = null,
-    val hasMore: Boolean = false,
-)
-
-fun <T> ListState<T>.toRefreshing(): ListState<T> {
-    return copy(isRefreshing = true, refreshError = null, isLoadingMore = false, loadMoreError = null)
-}
-
-fun <T> ListState<T>.toLoadingMore(): ListState<T> {
-    return copy(isRefreshing = false, refreshError = null, isLoadingMore = true, loadMoreError = null)
-}
-
-fun <T> ListState<T>.toRefreshError(refreshError: Throwable): ListState<T> {
-    return copy(isRefreshing = false, refreshError = refreshError)
-}
-
-fun <T> ListState<T>.toLoadMoreError(loadMoreError: Throwable): ListState<T> {
-    return copy(isLoadingMore = false, loadMoreError = loadMoreError)
-}
-
-fun <T> ListState<T>.replaceList(list: List<T>, hasMore: Boolean): ListState<T> {
-    return copy(data = list, isRefreshing = false, isLoadingMore = false, hasMore = hasMore)
-}
-
-fun <T> ListState<T>.appendList(list: List<T>, hasMore: Boolean): ListState<T> {
-    val oldList = data.toMutableList()
-    oldList.addAll(list)
-    return copy(data = oldList, isLoadingMore = false, hasMore = hasMore)
+/** A builder for [ListStateHelper] working with [SimpleListState]. */
+@Suppress("FunctionName")
+fun <T> SimpleListStateHelper(
+    state: MutableStateFlow<SimpleListState<T>> = MutableStateFlow(SimpleListState()),
+    listSize: (List<T>) -> Int = { it.size },
+    paging: Paging = AutoPaging {
+        listSize(state.value.data)
+    },
+): ListStateHelper<T, SimpleListState<T>> {
+    return ListStateHelper(state, listSize, paging)
 }
 
 /** A class used to multiple the state of a list. */
-class ListStateHelper<T>(
-    val state: MutableStateFlow<ListState<T>> = MutableStateFlow(ListState()),
+class ListStateHelper<T, LS : ListState<T, LS>>(
+    val state: MutableStateFlow<LS>,
     listSize: (List<T>) -> Int = { it.size },
     val paging: Paging = AutoPaging {
         listSize(state.value.data)
@@ -138,7 +112,7 @@ class ListStateHandlerBuilder internal constructor() {
  */
 fun <H, T> H.handleListStateWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
-    data: Flow<ListState<T>>,
+    data: Flow<ListState<T, *>>,
 ) where H : ListLayoutHost<T>, H : Fragment {
     handleListStateWithViewLifecycle(activeState, data) {
         // nothing to do.
@@ -150,7 +124,7 @@ fun <H, T> H.handleListStateWithViewLifecycle(
  */
 fun <H, T> H.handleListStateWithViewLifecycle(
     activeState: Lifecycle.State = Lifecycle.State.STARTED,
-    data: Flow<ListState<T>>,
+    data: Flow<ListState<T, *>>,
     handlerBuilder: ListStateHandlerBuilder.() -> Unit,
 ) where H : ListLayoutHost<T>, H : Fragment {
 
