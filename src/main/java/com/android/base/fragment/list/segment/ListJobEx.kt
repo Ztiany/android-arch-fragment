@@ -1,7 +1,9 @@
-package com.android.base.fragment.vm
+package com.android.base.fragment.list.segment
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -11,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-private const val DEFAULT_KEY = "default_vm_list_job_key"
+private const val DEFAULT_KEY = "default_fragment_list_job_key"
 
 private class RefreshTask {
     private var defaultJob: Job? = null
@@ -32,29 +34,32 @@ private class RefreshTask {
 
 }
 
-private val vmRefreshTasks = ConcurrentHashMap<ViewModel, RefreshTask>()
+private val fragmentRefreshTasks = ConcurrentHashMap<Fragment, RefreshTask>()
 
-fun ViewModel.startListJob(
+fun Fragment.startListJob(
     key: String = DEFAULT_KEY,
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend CoroutineScope.() -> Unit,
 ) {
-    val refreshTask = vmRefreshTasks.getOrPut(this) {
+
+    val refreshTask = fragmentRefreshTasks.getOrPut(this) {
         RefreshTask().apply {
-            Timber.d("add refresh task in ViewModel: ${this}.")
-            addCloseable {
-                Timber.d("remove refresh task in ViewModel: ${this}.")
-                vmRefreshTasks.remove(this@startListJob)
-            }
+            Timber.d("add refresh task in Fragment: ${this}.")
+            lifecycle.addObserver(observer = object : DefaultLifecycleObserver {
+                override fun onDestroy(owner: LifecycleOwner) {
+                    Timber.d("remove refresh task in Fragment: ${this}.")
+                    fragmentRefreshTasks.remove(this@startListJob)
+                }
+            })
         }
     }
 
-    val job = viewModelScope.launch(context, start, block)
+    val job = lifecycleScope.launch(context, start, block)
     refreshTask.setJob(key, job)
 
     job.invokeOnCompletion {
-        Timber.d("job completed in ViewModel: $this and remove it from tasks.")
+        Timber.d("job completed in Fragment: $this and remove it from tasks.")
         refreshTask.removeJob(key)
     }
 }
