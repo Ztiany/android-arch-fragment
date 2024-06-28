@@ -10,6 +10,12 @@ import timber.log.Timber
  * - [pagingStart] 分页起始页码，必须是 0 或 1。
  */
 fun calculatePageNumber(total: Int, pagingSize: Int, pagingStart: Int): Int {
+    Timber.d(
+        "calculatePageNumber: total=%d, pagingSize=%d, pagingStart=%d",
+        total,
+        pagingSize,
+        pagingStart
+    )
     /*                          s=1        s=0
       19/20     = 0          1          0
       21/20     = 1          2          1

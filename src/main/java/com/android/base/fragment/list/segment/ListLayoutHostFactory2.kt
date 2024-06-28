@@ -49,9 +49,7 @@ fun <T> buildListLayoutHost2(
 
     return object : ListLayoutHost<T> {
 
-        override val paging = AutoPaging {
-            dataManager.getListSize()
-        }
+        override val paging = AutoPaging(initialSize = dataManager.getListSize())
 
         override fun replaceData(data: List<T>) {
             dataManager.replaceData(data)

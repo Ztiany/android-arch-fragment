@@ -22,24 +22,16 @@ import kotlinx.coroutines.launch
 fun <T> SimpleListStateHelper(
     state: MutableStateFlow<SimpleListState<T>> = MutableStateFlow(SimpleListState()),
     @HasMoreCheckMode checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    /** callback for providing the list's size which will be used to calculate the page number. you don't need to provide it. it is only for debugging. */
-    realListSize: (List<T>) -> Int = { it.size },
-    paging: Paging = AutoPaging {
-        realListSize(state.value.data)
-    },
+    paging: Paging = AutoPaging(initialSize = state.value.data.size),
 ): ListStateHelper<T, SimpleListState<T>> {
-    return ListStateHelper(state, checkMode, realListSize, paging)
+    return ListStateHelper(state, checkMode, paging)
 }
 
 /** A class used to multiple the state of a list. */
 class ListStateHelper<T, LS : ListState<T, LS>>(
     val state: MutableStateFlow<LS>,
     @HasMoreCheckMode val checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    /** callback for providing the list's size which will be used to calculate the page number. you don't need to provide it. it is only for debugging. */
-    realListSize: (List<T>) -> Int = { it.size },
-    val paging: Paging = AutoPaging {
-        realListSize(state.value.data)
-    },
+    val paging: Paging = AutoPaging(initialSize = state.value.data.size),
 ) {
 
     fun updateToRefreshing() {

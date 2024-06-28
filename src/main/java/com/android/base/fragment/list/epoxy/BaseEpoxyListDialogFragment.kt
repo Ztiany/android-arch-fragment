@@ -80,7 +80,6 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
 
     protected open fun onLoadMore() = onStartLoad()
 
-    /**called by [onRefresh] or [onLoadMore], you can get current loading type from [isRefreshing] or [isLoadingMore].*/
     protected open fun onStartLoad() {}
 
     override fun replaceData(data: List<T>) = listLayoutHostImpl.replaceData(data)
@@ -111,6 +110,7 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
         return listLayoutHostImpl.isRefreshing()
     }
 
+    @Deprecated("Don't use this method because you can't get the real paging number.", level = DeprecationLevel.ERROR)
     override val paging: Paging
         get() = listLayoutHostImpl.paging
 

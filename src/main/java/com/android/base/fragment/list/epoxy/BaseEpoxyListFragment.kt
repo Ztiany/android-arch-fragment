@@ -110,7 +110,7 @@ abstract class BaseEpoxyListFragment<T, VB : ViewBinding> : BaseUIFragment<VB>()
         return listLayoutHostImpl.isRefreshing()
     }
 
-    @Deprecated("You may don't need this method, use [ListStateHelper] instead")
+    @Deprecated("Don't use this method because you can't get the real paging number.", level = DeprecationLevel.ERROR)
     override val paging: Paging
         get() = listLayoutHostImpl.paging
 
