@@ -2,7 +2,7 @@ package com.android.base.fragment.state
 
 import androidx.lifecycle.ViewModel
 import com.android.base.core.AndroidSword
-import com.android.base.fragment.tool.HandingProcedure
+import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
@@ -24,9 +24,9 @@ class DataStateHandlerBuilder<D> internal constructor() {
 
     internal var onResult: ((D) -> Unit)? = null
 
-    internal var onEmpty: (HandingProcedure.() -> Unit)? = null
-    internal var onError: (HandingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit)? = null
-    internal var onLoading: (HandingProcedure.(isEmpty: Boolean) -> Unit)? = null
+    internal var onEmpty: (HandlingProcedure.() -> Unit)? = null
+    internal var onError: (HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit)? = null
+    internal var onLoading: (HandlingProcedure.(isEmpty: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
@@ -34,11 +34,11 @@ class DataStateHandlerBuilder<D> internal constructor() {
         checker = dataChecker
     }
 
-    fun onEmpty(action: HandingProcedure. () -> Unit) {
+    fun onEmpty(action: HandlingProcedure. () -> Unit) {
         onEmpty = action
     }
 
-    fun onError(action: HandingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit) {
+    fun onError(action: HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit) {
         onError = action
     }
 
@@ -46,7 +46,7 @@ class DataStateHandlerBuilder<D> internal constructor() {
         onResult = action
     }
 
-    fun onLoading(action: HandingProcedure.(isEmpty: Boolean) -> Unit) {
+    fun onLoading(action: HandlingProcedure.(isEmpty: Boolean) -> Unit) {
         onLoading = action
     }
 
@@ -140,7 +140,7 @@ fun <D> StateLayoutHost.handleDataState(
         }
         // your custom handling process
         stateHandler.onLoading?.also {
-            HandingProcedure(defaultHandling).it(isEmpty)
+            HandlingProcedure(defaultHandling).it(isEmpty)
         } ?: defaultHandling()
         // always dispatch data if we have.
         dispatchData()
@@ -161,7 +161,7 @@ fun <D> StateLayoutHost.handleDataState(
         val defaultHandling = { showEmptyLayout() }
         // your custom handling process
         stateHandler.onEmpty?.also {
-            HandingProcedure(defaultHandling).it()
+            HandlingProcedure(defaultHandling).it()
         } ?: defaultHandling()
         return
     }
@@ -184,7 +184,7 @@ fun <D> StateLayoutHost.handleDataState(
         // your custom handling process
         stateHandler.onError?.also {
             // always dispatch error.
-            HandingProcedure(defaultHandling).it(error, isEmpty)
+            HandlingProcedure(defaultHandling).it(error, isEmpty)
         } ?: defaultHandling()
     }
 }

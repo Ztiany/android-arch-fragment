@@ -2,6 +2,7 @@ package com.android.base.fragment.list
 
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.list.segment.BaseListFragment
+import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
@@ -30,9 +31,8 @@ fun ListLayoutHost<*>.handleListLoading(
 /** @see [BaseListFragment] */
 fun <D> ListLayoutHost<D>.handleListData(
     list: List<D>?,
-    monopolizedEmptyHandler: Boolean = false,
-    onEmpty: (() -> Unit)? = null,
-    hasMore: (() -> Boolean)? = null,
+    onEmpty: (HandlingProcedure.() -> Unit)? = null,
+    hasMore: ((List<D>) -> Boolean)? = null,
 ) {
     if (isLoadingMore()) {
         if (!list.isNullOrEmpty()) {
@@ -49,15 +49,17 @@ fun <D> ListLayoutHost<D>.handleListData(
         if (hasMore == null) {
             loadMoreCompleted(list != null && paging.hasMore(list.size))
         } else {
-            loadMoreCompleted(hasMore())
+            loadMoreCompleted(list != null && hasMore(list))
         }
     }
 
     if (isEmpty()) {
-        if (!monopolizedEmptyHandler) {
-            showEmptyLayout()
-        }
-        onEmpty?.invoke()
+        // default handling process
+        val defaultHandling = { showEmptyLayout() }
+        // your custom handling process
+        onEmpty?.also {
+            HandlingProcedure(defaultHandling).it()
+        } ?: defaultHandling()
     } else {
         showContentLayout()
     }

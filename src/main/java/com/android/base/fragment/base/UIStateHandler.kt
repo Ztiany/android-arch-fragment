@@ -20,7 +20,7 @@ import com.android.base.foundation.state.onError
 import com.android.base.foundation.state.onLoadingWithStep
 import com.android.base.foundation.state.onNoData
 import com.android.base.foundation.state.onSuccess
-import com.android.base.fragment.tool.HandingProcedure
+import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.tool.collectFlowRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.LoadingViewHost
 import kotlinx.coroutines.flow.Flow
@@ -37,18 +37,18 @@ fun LoadingViewHost.dismissLoadingDialogDelayed(onDismiss: (() -> Unit)? = null)
 /** Configure how to handle UI state [State]. */
 class StateHandlerBuilder<L, D, E> internal constructor() {
 
-    internal var onLoading: (HandingProcedure.(step: L?) -> Unit)? = null
+    internal var onLoading: (HandlingProcedure.(step: L?) -> Unit)? = null
     internal var onLoadingEnd: (() -> Unit)? = null
     internal var onIdle: (() -> Unit)? = null
 
     // act like an event
-    internal var onError: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onError: (HandlingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccess: ((D?) -> Unit)? = null
     internal var onData: ((D) -> Unit)? = null
     internal var onNoData: (() -> Unit)? = null
 
     // act like a state
-    internal var onErrorState: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onErrorState: (HandlingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccessState: ((D?) -> Unit)? = null
     internal var onDataState: ((D) -> Unit)? = null
     internal var onNoDataState: (() -> Unit)? = null
@@ -59,7 +59,7 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var handlerErrorAsEvent: Boolean = false
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
-    fun onLoadingWithStep(onLoading: HandingProcedure.(step: L?) -> Unit) {
+    fun onLoadingWithStep(onLoading: HandlingProcedure.(step: L?) -> Unit) {
         this.onLoading = onLoading
     }
 
@@ -76,24 +76,24 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     }
 
     /** [onError] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onError(onErrorEvent: HandingProcedure.(error: Throwable) -> Unit) {
+    fun onError(onErrorEvent: HandlingProcedure.(error: Throwable) -> Unit) {
         onErrorWithReason { error, _ ->
             onErrorEvent(error)
         }
     }
 
     /** [onErrorEventWithReason] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onErrorWithReason(onErrorEventWithReason: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
+    fun onErrorWithReason(onErrorEventWithReason: HandlingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onError = onErrorEventWithReason
     }
 
     /** [onErrorState] will be called once [State] is [Error]. */
-    fun onErrorState(onErrorState: HandingProcedure.(error: Throwable) -> Unit) {
+    fun onErrorState(onErrorState: HandlingProcedure.(error: Throwable) -> Unit) {
         onErrorStateWithReason { error, _ -> onErrorState(error) }
     }
 
     /** [onErrorStateWithReason] will be called once [State] is [Error]. */
-    fun onErrorStateWithReason(onErrorStateWithReason: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
+    fun onErrorStateWithReason(onErrorStateWithReason: HandlingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onErrorState = onErrorStateWithReason
     }
 
@@ -244,7 +244,7 @@ private fun <H, L, D, E> H.handleStateInternal(
                 }
                 // your custom handling process
                 stateHandler.onLoading?.also {
-                    HandingProcedure(defaultHandling).it(state.step)
+                    HandlingProcedure(defaultHandling).it(state.step)
                 } ?: defaultHandling()
             }
         }
@@ -256,7 +256,7 @@ private fun <H, L, D, E> H.handleStateInternal(
                 stateHandler.onLoadingEnd?.invoke()
 
                 if (stateHandler.onError != null || stateHandler.onErrorState != null) {
-                    val procedure = HandingProcedure {
+                    val procedure = HandlingProcedure {
                         showMessage(AndroidSword.errorConvert.convert(state.error))
                     }
                     if (!state.isHandled) {

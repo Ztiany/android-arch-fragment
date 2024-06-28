@@ -1,6 +1,6 @@
 package com.android.base.fragment.tool
 
-class HandingProcedure internal constructor(
+class HandlingProcedure internal constructor(
     private val defaultHandling: (() -> Unit)? = null,
 ) {
 

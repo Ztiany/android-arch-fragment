@@ -13,7 +13,7 @@ import com.android.base.foundation.state.Loading
 import com.android.base.foundation.state.NoData
 import com.android.base.foundation.state.State
 import com.android.base.foundation.state.Success
-import com.android.base.fragment.tool.HandingProcedure
+import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
@@ -42,11 +42,11 @@ internal fun <D> newDefaultChecker(): ((D) -> Boolean) {
 class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var checker: DataChecker<D> = newDefaultChecker()
 
-    internal var onResult: (HandingProcedure.(D) -> Unit)? = null
+    internal var onResult: (HandlingProcedure.(D) -> Unit)? = null
 
-    internal var onEmpty: (HandingProcedure.() -> Unit)? = null
-    internal var onError: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
-    internal var onLoading: (HandingProcedure.(step: L?) -> Unit)? = null
+    internal var onEmpty: (HandlingProcedure.() -> Unit)? = null
+    internal var onError: (HandlingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onLoading: (HandlingProcedure.(step: L?) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
@@ -54,19 +54,19 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
         checker = dataChecker
     }
 
-    fun onEmpty(action: HandingProcedure. () -> Unit) {
+    fun onEmpty(action: HandlingProcedure. () -> Unit) {
         onEmpty = action
     }
 
-    fun onError(action: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
+    fun onError(action: HandlingProcedure.(error: Throwable, reason: E?) -> Unit) {
         onError = action
     }
 
-    fun onResult(action: HandingProcedure. (D) -> Unit) {
+    fun onResult(action: HandlingProcedure. (D) -> Unit) {
         onResult = action
     }
 
-    fun onLoading(action: HandingProcedure.(step: L?) -> Unit) {
+    fun onLoading(action: HandlingProcedure.(step: L?) -> Unit) {
         onLoading = action
     }
 
@@ -144,7 +144,7 @@ fun <L, D, E> StateLayoutHost.handleState(
             val defaultHandling = { handleStateLoading(stateHandlerBuilder.showContentLoadingWhenEmpty) }
             // your custom handling process
             stateHandlerBuilder.onLoading?.also {
-                HandingProcedure(defaultHandling).it(state.step)
+                HandlingProcedure(defaultHandling).it(state.step)
             } ?: defaultHandling()
         }
 
@@ -153,7 +153,7 @@ fun <L, D, E> StateLayoutHost.handleState(
             val defaultHandling = { handleStateError(state.error) }
             // your custom handling process
             stateHandlerBuilder.onError?.also {
-                HandingProcedure(defaultHandling).it(state.error, state.reason)
+                HandlingProcedure(defaultHandling).it(state.error, state.reason)
             } ?: defaultHandling()
         }
 
@@ -185,8 +185,8 @@ private fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Bool
 private fun <D> StateLayoutHost.handleStateData(
     data: D?,
     emptyChecker: DataChecker<D> = newDefaultChecker(),
-    onEmpty: (HandingProcedure.() -> Unit)? = null,
-    onResult: (HandingProcedure.(D) -> Unit)? = null,
+    onEmpty: (HandlingProcedure.() -> Unit)? = null,
+    onResult: (HandlingProcedure.(D) -> Unit)? = null,
 ) {
     if (isRefreshEnable && isRefreshing()) {
         refreshCompleted()
@@ -197,14 +197,14 @@ private fun <D> StateLayoutHost.handleStateData(
         val defaultHandling = { showEmptyLayout() }
         // your custom handling process
         onEmpty?.also {
-            HandingProcedure(defaultHandling).it()
+            HandlingProcedure(defaultHandling).it()
         } ?: defaultHandling()
     } else {
         // default handling process
         val defaultHandling = { showContentLayout() }
         // your custom handling process
         onResult?.also {
-            HandingProcedure(defaultHandling).it(data)
+            HandlingProcedure(defaultHandling).it(data)
         } ?: defaultHandling()
     }
 }

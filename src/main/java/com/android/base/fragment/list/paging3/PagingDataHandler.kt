@@ -7,7 +7,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import com.android.base.core.AndroidSword
-import com.android.base.fragment.tool.HandingProcedure
+import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.PagingHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 
 class PagingDataHandlerBuilder<T : Any> internal constructor() {
 
-    internal var onRefreshError: (HandingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
-    internal var onRefreshEmpty: (HandingProcedure.() -> Unit)? = null
-    internal var onRefreshCompleted: (HandingProcedure.() -> Unit)? = null
+    internal var onRefreshError: (HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
+    internal var onRefreshEmpty: (HandlingProcedure.() -> Unit)? = null
+    internal var onRefreshCompleted: (HandlingProcedure.() -> Unit)? = null
 
     internal var onLoadMoreError: ((error: Throwable) -> Unit)? = null
     internal var onLoadMoreCompleted: ((reachedEnd: Boolean) -> Unit)? = null
@@ -27,15 +27,15 @@ class PagingDataHandlerBuilder<T : Any> internal constructor() {
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
     /** handle when the list is empty after a successful refreshing. */
-    fun onRefreshEmpty(action: HandingProcedure.() -> Unit) {
+    fun onRefreshEmpty(action: HandlingProcedure.() -> Unit) {
         onRefreshEmpty = action
     }
 
-    fun onRefreshCompleted(action: HandingProcedure. () -> Unit) {
+    fun onRefreshCompleted(action: HandlingProcedure. () -> Unit) {
         onRefreshCompleted = action
     }
 
-    fun onRefreshError(action: HandingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
+    fun onRefreshError(action: HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
         onRefreshError = action
     }
 
@@ -153,7 +153,7 @@ private fun PagingHost.handlePagingRefreshState(
             }
             // your custom handling process
             pagingDataHandler.onRefreshError?.also {
-                HandingProcedure(defaultHandling).it(true, refreshError)
+                HandlingProcedure(defaultHandling).it(true, refreshError)
             } ?: defaultHandling()
             return
         }
@@ -165,14 +165,14 @@ private fun PagingHost.handlePagingRefreshState(
                 val defaultHandling = { showEmptyLayout() }
                 // your custom handling process
                 pagingDataHandler.onRefreshEmpty?.also {
-                    HandingProcedure(defaultHandling).it()
+                    HandlingProcedure(defaultHandling).it()
                 } ?: defaultHandling()
             } else {
                 // default handling process
                 val defaultHandling = { showContentLayout() }
                 // your custom handling process
                 pagingDataHandler.onRefreshCompleted?.also {
-                    HandingProcedure(defaultHandling).it()
+                    HandlingProcedure(defaultHandling).it()
                 } ?: defaultHandling()
             }
             if (isRefreshing()) {
