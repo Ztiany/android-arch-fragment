@@ -13,6 +13,7 @@ import com.android.base.foundation.state.Loading
 import com.android.base.foundation.state.NoData
 import com.android.base.foundation.state.State
 import com.android.base.foundation.state.Success
+import com.android.base.fragment.tool.HandingProcedure
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
@@ -37,38 +38,36 @@ internal fun <D> newDefaultChecker(): ((D) -> Boolean) {
     }
 }
 
-/** @see handleDataState */
+/** @see BaseStateFragment */
 class StateHandlerBuilder<L, D, E> internal constructor() {
-    internal var emptyChecker: DataChecker<D> = newDefaultChecker()
+    internal var checker: DataChecker<D> = newDefaultChecker()
 
-    internal var onEmpty: (() -> Unit)? = null
-    internal var onResult: ((D) -> Unit)? = null
-    internal var onError: ((error: Throwable, reason: E?) -> Unit)? = null
-    internal var onLoading: ((step: L?) -> Unit)? = null
+    internal var onResult: (HandingProcedure.(D) -> Unit)? = null
+
+    internal var onEmpty: (HandingProcedure.() -> Unit)? = null
+    internal var onError: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onLoading: (HandingProcedure.(step: L?) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
-    internal var monopolizedErrorHandler = false
-    internal var monopolizedEmptyHandler = false
-    internal var monopolizedLoadingHandler = false
+    fun checker(dataChecker: DataChecker<D>) {
+        checker = dataChecker
+    }
 
-    fun onEmpty(monopolized: Boolean = false, action: () -> Unit) {
+    fun onEmpty(action: HandingProcedure. () -> Unit) {
         onEmpty = action
-        monopolizedEmptyHandler = monopolized
     }
 
-    fun onError(monopolized: Boolean = false, action: (error: Throwable, reason: E?) -> Unit) {
+    fun onError(action: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
         onError = action
-        monopolizedErrorHandler = monopolized
     }
 
-    fun onResult(action: (D) -> Unit) {
+    fun onResult(action: HandingProcedure. (D) -> Unit) {
         onResult = action
     }
 
-    fun onLoading(monopolized: Boolean = false, action: (step: L?) -> Unit) {
+    fun onLoading(action: HandingProcedure.(step: L?) -> Unit) {
         onLoading = action
-        monopolizedLoadingHandler = monopolized
     }
 
     /**
@@ -141,17 +140,21 @@ fun <L, D, E> StateLayoutHost.handleState(
         is Idle -> {}
 
         is Loading -> {
-            if (!stateHandlerBuilder.monopolizedLoadingHandler) {
-                handleLoading(stateHandlerBuilder.showContentLoadingWhenEmpty)
-            }
-            stateHandlerBuilder.onLoading?.invoke(state.step)
+            // default handling process
+            val defaultHandling = { handleStateLoading(stateHandlerBuilder.showContentLoadingWhenEmpty) }
+            // your custom handling process
+            stateHandlerBuilder.onLoading?.also {
+                HandingProcedure(defaultHandling).it(state.step)
+            } ?: defaultHandling()
         }
 
         is Error -> {
-            if (!stateHandlerBuilder.monopolizedErrorHandler) {
-                handleError(state.error)
-            }
-            stateHandlerBuilder.onError?.invoke(state.error, state.reason)
+            // default handling process
+            val defaultHandling = { handleStateError(state.error) }
+            // your custom handling process
+            stateHandlerBuilder.onError?.also {
+                HandingProcedure(defaultHandling).it(state.error, state.reason)
+            } ?: defaultHandling()
         }
 
         is Success<D> -> {
@@ -159,10 +162,9 @@ fun <L, D, E> StateLayoutHost.handleState(
                 is NoData -> null
                 is Data<D> -> state.value
             }
-            handleData(
+            handleStateData(
                 data,
-                stateHandlerBuilder.emptyChecker,
-                stateHandlerBuilder.monopolizedEmptyHandler,
+                stateHandlerBuilder.checker,
                 stateHandlerBuilder.onEmpty,
                 stateHandlerBuilder.onResult
             )
@@ -171,7 +173,7 @@ fun <L, D, E> StateLayoutHost.handleState(
 }
 
 /** @see BaseStateFragment */
-private fun StateLayoutHost.handleLoading(showContentLoadingWhenEmpty: Boolean = false) {
+private fun StateLayoutHost.handleStateLoading(showContentLoadingWhenEmpty: Boolean = false) {
     if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
         showLoadingLayout()
     } else {
@@ -180,29 +182,34 @@ private fun StateLayoutHost.handleLoading(showContentLoadingWhenEmpty: Boolean =
 }
 
 /** @see BaseStateFragment */
-private fun <D> StateLayoutHost.handleData(
+private fun <D> StateLayoutHost.handleStateData(
     data: D?,
     emptyChecker: DataChecker<D> = newDefaultChecker(),
-    monopolizedEmptyHandler: Boolean = false,
-    onEmpty: (() -> Unit)? = null,
-    onResult: ((D) -> Unit)? = null,
+    onEmpty: (HandingProcedure.() -> Unit)? = null,
+    onResult: (HandingProcedure.(D) -> Unit)? = null,
 ) {
     if (isRefreshEnable && isRefreshing()) {
         refreshCompleted()
     }
 
     if (data == null || emptyChecker(data)) {
-        if (!monopolizedEmptyHandler) {
-            showEmptyLayout()
-        }
-        onEmpty?.invoke()
+        // default handling process
+        val defaultHandling = { showEmptyLayout() }
+        // your custom handling process
+        onEmpty?.also {
+            HandingProcedure(defaultHandling).it()
+        } ?: defaultHandling()
     } else {
-        onResult?.invoke(data)
-        showContentLayout()
+        // default handling process
+        val defaultHandling = { showContentLayout() }
+        // your custom handling process
+        onResult?.also {
+            HandingProcedure(defaultHandling).it(data)
+        } ?: defaultHandling()
     }
 }
 
-private fun StateLayoutHost.handleError(throwable: Throwable) {
+private fun StateLayoutHost.handleStateError(throwable: Throwable) {
     if (isRefreshEnable && isRefreshing()) {
         refreshCompleted()
     }

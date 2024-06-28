@@ -20,6 +20,7 @@ import com.android.base.foundation.state.onError
 import com.android.base.foundation.state.onLoadingWithStep
 import com.android.base.foundation.state.onNoData
 import com.android.base.foundation.state.onSuccess
+import com.android.base.fragment.tool.HandingProcedure
 import com.android.base.fragment.tool.collectFlowRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.LoadingViewHost
 import kotlinx.coroutines.flow.Flow
@@ -33,31 +34,21 @@ fun LoadingViewHost.dismissLoadingDialogDelayed(onDismiss: (() -> Unit)? = null)
     dismissLoadingDialog(AndroidSword.minimalDialogDisplayTime, onDismiss)
 }
 
-class ErrorHandingProcedure internal constructor(
-    private val defaultHanding: (() -> Unit)? = null,
-) {
-
-    fun continueDefaultProcedure() {
-        defaultHanding?.invoke()
-    }
-
-}
-
 /** Configure how to handle UI state [State]. */
 class StateHandlerBuilder<L, D, E> internal constructor() {
 
-    internal var onLoading: ((step: L?) -> Unit)? = null
+    internal var onLoading: (HandingProcedure.(step: L?) -> Unit)? = null
     internal var onLoadingEnd: (() -> Unit)? = null
     internal var onIdle: (() -> Unit)? = null
 
     // act like an event
-    internal var onError: (ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onError: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccess: ((D?) -> Unit)? = null
     internal var onData: ((D) -> Unit)? = null
     internal var onNoData: (() -> Unit)? = null
 
     // act like a state
-    internal var onErrorState: (ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
+    internal var onErrorState: (HandingProcedure.(error: Throwable, reason: E?) -> Unit)? = null
     internal var onSuccessState: ((D?) -> Unit)? = null
     internal var onDataState: ((D) -> Unit)? = null
     internal var onNoDataState: (() -> Unit)? = null
@@ -68,7 +59,7 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var handlerErrorAsEvent: Boolean = false
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
-    fun onLoadingWithStep(onLoading: (step: L?) -> Unit) {
+    fun onLoadingWithStep(onLoading: HandingProcedure.(step: L?) -> Unit) {
         this.onLoading = onLoading
     }
 
@@ -85,24 +76,24 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     }
 
     /** [onError] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onError(onErrorEvent: ErrorHandingProcedure.(error: Throwable) -> Unit) {
+    fun onError(onErrorEvent: HandingProcedure.(error: Throwable) -> Unit) {
         onErrorWithReason { error, _ ->
             onErrorEvent(error)
         }
     }
 
     /** [onErrorEventWithReason] will be called when [State] is [Error] and is not handled. It behaves like an event. */
-    fun onErrorWithReason(onErrorEventWithReason: ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit) {
+    fun onErrorWithReason(onErrorEventWithReason: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onError = onErrorEventWithReason
     }
 
     /** [onErrorState] will be called once [State] is [Error]. */
-    fun onErrorState(onErrorState: ErrorHandingProcedure.(error: Throwable) -> Unit) {
+    fun onErrorState(onErrorState: HandingProcedure.(error: Throwable) -> Unit) {
         onErrorStateWithReason { error, _ -> onErrorState(error) }
     }
 
     /** [onErrorStateWithReason] will be called once [State] is [Error]. */
-    fun onErrorStateWithReason(onErrorStateWithReason: ErrorHandingProcedure.(error: Throwable, reason: E?) -> Unit) {
+    fun onErrorStateWithReason(onErrorStateWithReason: HandingProcedure.(error: Throwable, reason: E?) -> Unit) {
         this.onErrorState = onErrorStateWithReason
     }
 
@@ -159,17 +150,22 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
 }
 
 /**
- * 这是一个网络请求状态转换处理的通用逻辑封装，一般情况下，网络请求流程为：
+ * This function encapsulates common logic for handling network request states.
+ * Typically, the network request flow includes:
  *
- * 1. 发起网络请求，展示 loading 对话框。
- * 2. 网络请求正常返回，则展示调用结果。
- * 3. 网络请求发送错误，则提示用户请求错误。
+ * 1. Initiating the network request and displaying a loading dialog.
+ * 2. Displaying the result upon successful network response.
+ * 3. Prompting the user in case of a network request error.
  *
- * [State] 表示请求状态，每次状态变更，[LiveData] 都应该进行通知，该方法订阅 [LiveData] 并对各种状态进行处理。
- * 展示 loading 和对错误进行提示都是自动进行的，通常情况下，只需要提供 [StateHandlerBuilder.onSuccess] 对正常的网络结果进行处理即可。
- * 当然如果希望自己处理错误，则可以提供 [StateHandlerBuilder.onError] 回调。如果希望自己处理加载中的逻辑，则可以提供 [StateHandlerBuilder.onLoading] 回调。
+ * [State] represents the request state, and each state change should notify the associated [LiveData].
+ * This method subscribes to [LiveData] and handles various states.
+ * Automatic handling includes displaying loading and error prompts.
+ * Usually, only [StateHandlerBuilder.onSuccess] is required to handle successful network results.
+ * Optionally, you can provide [StateHandlerBuilder.onError] to handle errors yourself,
+ * and [StateHandlerBuilder.onLoading] to customize loading logic.
  *
- * 另外需要注意的是：[StateHandlerBuilder.onSuccess] =  [StateHandlerBuilder.onData] + [StateHandlerBuilder.onNoData]，请根据你的偏好进行选择。
+ * Additionally, note that [StateHandlerBuilder.onSuccess] = [StateHandlerBuilder.onData] + [StateHandlerBuilder.onNoData].
+ * Choose based on your preference.
  */
 fun <H, L, D, E> H.handleLiveData(
     data: LiveData<State<L, D, E>>,
@@ -208,11 +204,11 @@ fun <H, L, D, E> H.handleFlowWithViewLifecycle(
     data: Flow<State<L, D, E>>,
     handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : Fragment {
-    val builder = StateHandlerBuilder<L, D, E>().apply {
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
     collectFlowRepeatedlyOnViewLifecycle(activeState, data = data) {
-        handleStateInternal(it, builder)
+        handleStateInternal(it, stateHandler)
     }
 }
 
@@ -221,31 +217,35 @@ fun <H, L, D, E> H.handleState(
     state: State<L, D, E>,
     handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val builder = StateHandlerBuilder<L, D, E>().apply {
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply {
         handlerBuilder()
     }
-    handleStateInternal(state, builder)
+    handleStateInternal(state, stateHandler)
 }
 
 private fun <H, L, D, E> H.handleStateInternal(
     state: State<L, D, E>,
-    handlerBuilder: StateHandlerBuilder<L, D, E>,
+    stateHandler: StateHandlerBuilder<L, D, E>,
 ) where H : LoadingViewHost, H : LifecycleOwner {
 
     when (state) {
         is Idle -> {
-            handlerBuilder.onIdle?.invoke()
+            stateHandler.onIdle?.invoke()
         }
 
         //----------------------------------------loading start
         // The loading state should always be handled, so we ignore the clearAfterHanded config here.
         is Loading -> {
-            if (handlerBuilder.showLoading) {
-                if (handlerBuilder.onLoading == null) {
-                    showLoadingDialog(handlerBuilder.loadingMessage, !handlerBuilder.forceLoading)
-                } else {
-                    handlerBuilder.onLoading?.invoke(state.step)
+            if (stateHandler.showLoading) {
+                // default handling
+                val defaultHandling = {
+                    showLoadingDialog(stateHandler.loadingMessage, !stateHandler.forceLoading)
+                    Unit
                 }
+                // your custom handling process
+                stateHandler.onLoading?.also {
+                    HandingProcedure(defaultHandling).it(state.step)
+                } ?: defaultHandling()
             }
         }
         //----------------------------------------loading end
@@ -253,16 +253,18 @@ private fun <H, L, D, E> H.handleStateInternal(
         //----------------------------------------error start
         is Error -> {
             dismissLoadingDialogDelayed {
-                handlerBuilder.onLoadingEnd?.invoke()
+                stateHandler.onLoadingEnd?.invoke()
 
-                if (handlerBuilder.onError != null || handlerBuilder.onErrorState != null) {
-                    val procedure = ErrorHandingProcedure { showMessage(AndroidSword.errorConvert.convert(state.error)) }
-                    if (!state.isHandled) {
-                        handlerBuilder.onError?.invoke(procedure, state.error, state.reason)
+                if (stateHandler.onError != null || stateHandler.onErrorState != null) {
+                    val procedure = HandingProcedure {
+                        showMessage(AndroidSword.errorConvert.convert(state.error))
                     }
-                    handlerBuilder.onErrorState?.invoke(procedure, state.error, state.reason)
+                    if (!state.isHandled) {
+                        stateHandler.onError?.invoke(procedure, state.error, state.reason)
+                    }
+                    stateHandler.onErrorState?.invoke(procedure, state.error, state.reason)
                 } else {
-                    if (!state.isHandled || (state.isHandled && !handlerBuilder.handlerErrorAsEvent)) {
+                    if (!state.isHandled || (state.isHandled && !stateHandler.handlerErrorAsEvent)) {
                         showMessage(AndroidSword.errorConvert.convert(state.error))
                     }
                 }
@@ -275,9 +277,9 @@ private fun <H, L, D, E> H.handleStateInternal(
         //----------------------------------------success start
         is Success<D> -> {
             dismissLoadingDialogDelayed {
-                handlerBuilder.onLoadingEnd?.invoke()
-                processOnSuccess(state, handlerBuilder.onSuccess, handlerBuilder.onData, handlerBuilder.onNoData, true)
-                processOnSuccess(state, handlerBuilder.onSuccessState, handlerBuilder.onDataState, handlerBuilder.onNoDataState, false)
+                stateHandler.onLoadingEnd?.invoke()
+                processOnSuccess(state, stateHandler.onSuccess, stateHandler.onData, stateHandler.onNoData, true)
+                processOnSuccess(state, stateHandler.onSuccessState, stateHandler.onDataState, stateHandler.onNoDataState, false)
                 state.markAsHandled()
             }
         }
@@ -285,7 +287,6 @@ private fun <H, L, D, E> H.handleStateInternal(
 
     }
 }
-
 
 private fun <D> processOnSuccess(state: Success<D>, onSuccess: ((D?) -> Unit)?, onData: ((D) -> Unit)?, onNoData: (() -> Unit)?, asEvent: Boolean) {
     if (asEvent && state.isHandled) {

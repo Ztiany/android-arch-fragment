@@ -1,9 +1,10 @@
 package com.android.base.fragment.state
 
+import androidx.lifecycle.ViewModel
 import com.android.base.core.AndroidSword
+import com.android.base.fragment.tool.HandingProcedure
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
-import timber.log.Timber
 
 interface DataState<T> {
     val data: T?
@@ -19,36 +20,34 @@ data class SimpleDataState<T>(
 
 /** @see BaseStateFragment */
 class DataStateHandlerBuilder<D> internal constructor() {
-    internal var emptyChecker: DataChecker<D> = newDefaultChecker()
+    internal var checker: DataChecker<D> = newDefaultChecker()
 
-    internal var onEmpty: (() -> Unit)? = null
     internal var onResult: ((D) -> Unit)? = null
-    internal var onError: ((error: Throwable, isEmpty: Boolean) -> Unit)? = null
-    internal var onLoading: ((isEmpty: Boolean) -> Unit)? = null
+
+    internal var onEmpty: (HandingProcedure.() -> Unit)? = null
+    internal var onError: (HandingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit)? = null
+    internal var onLoading: (HandingProcedure.(isEmpty: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
-    internal var monopolizedErrorHandler = false
-    internal var monopolizedEmptyHandler = false
-    internal var monopolizedLoadingHandler = false
-
-    fun onEmpty(monopolized: Boolean = false, action: () -> Unit) {
-        onEmpty = action
-        monopolizedEmptyHandler = monopolized
+    fun checker(dataChecker: DataChecker<D>) {
+        checker = dataChecker
     }
 
-    fun onError(monopolized: Boolean = false, action: (error: Throwable, isEmpty: Boolean) -> Unit) {
+    fun onEmpty(action: HandingProcedure. () -> Unit) {
+        onEmpty = action
+    }
+
+    fun onError(action: HandingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit) {
         onError = action
-        monopolizedErrorHandler = monopolized
     }
 
     fun onResult(action: (D) -> Unit) {
         onResult = action
     }
 
-    fun onLoading(monopolized: Boolean = false, action: (isEmpty: Boolean) -> Unit) {
+    fun onLoading(action: HandingProcedure.(isEmpty: Boolean) -> Unit) {
         onLoading = action
-        monopolizedLoadingHandler = monopolized
     }
 
     fun useContentLoadingWhenEmpty() {
@@ -57,9 +56,8 @@ class DataStateHandlerBuilder<D> internal constructor() {
 
 }
 
-
 /**
- * Like its name "Retained State", we should handle the state in a retained way. Your code may be
+ * Like its name "Retained State", we should handle the state in a retained way. Your code in your [ViewModel] may be
  * like this:
  *
  * ```
@@ -93,13 +91,30 @@ class DataStateHandlerBuilder<D> internal constructor() {
  *}
  * ```
  *
+ * then handle data in your [BaseStateFragment] or [BaseStateDialogFragment]:
+ *
+ * ```
+ * class ProtocolFragment : BaseStateFragment<ProtocolFragmentBinding>() {
+ *
+ *     private fun subscribeViewModel() {
+ *          viewModel.protocolContentState.observe(this) {
+ *             handleDataState(it) {
+ *                 onResult { data ->
+ *                     vb.protocolView.setProtocol(data.content)
+ *                 }
+ *             }
+ *          }
+ *      }
+ *
+ * }
+ * ```
+ *
  * @see BaseStateFragment
  */
 fun <D> StateLayoutHost.handleDataState(
     state: DataState<D>,
     handler: DataStateHandlerBuilder<D>.() -> Unit,
 ) {
-
     val stateHandler = DataStateHandlerBuilder<D>().apply(handler)
 
     val data = state.data
@@ -110,19 +125,23 @@ fun <D> StateLayoutHost.handleDataState(
         }
     }
 
-    val isEmpty = data == null || stateHandler.emptyChecker(data)
+    val isEmpty = data == null || stateHandler.checker(data)
     val error = state.refreshError
 
-    // handing on refreshing.
+    // handling on refreshing.
     if (state.isRefreshing) {
-        if (!stateHandler.monopolizedLoadingHandler) {
+        // default handling process
+        val defaultHandling = {
             if ((!isRefreshEnable) or isEmpty && stateHandler.showContentLoadingWhenEmpty && !isRefreshing()) {
                 showLoadingLayout()
             } else {
                 setRefreshing()
             }
         }
-        stateHandler.onLoading?.invoke(isEmpty)
+        // your custom handling process
+        stateHandler.onLoading?.also {
+            HandingProcedure(defaultHandling).it(isEmpty)
+        } ?: defaultHandling()
         // always dispatch data if we have.
         dispatchData()
         return
@@ -138,30 +157,34 @@ fun <D> StateLayoutHost.handleDataState(
 
     // refreshing successfully but has no data.
     if (error == null && isEmpty) {
-        if (!stateHandler.monopolizedEmptyHandler) {
-            showEmptyLayout()
-        }
-        stateHandler.onEmpty?.invoke()
+        // default handling process
+        val defaultHandling = { showEmptyLayout() }
+        // your custom handling process
+        stateHandler.onEmpty?.also {
+            HandingProcedure(defaultHandling).it()
+        } ?: defaultHandling()
         return
     }
 
     error?.let {
-        // always dispatch error.
-        stateHandler.onError?.invoke(it, isEmpty)
-        if (stateHandler.monopolizedErrorHandler || !isEmpty) {
-            return
-        }
-
-        // refreshing failed but we don't have previously loaded data.
-        val errorTypeClassifier = AndroidSword.errorClassifier
-        if (errorTypeClassifier != null) {
-            when {
-                errorTypeClassifier.isNetworkError(it) -> showNetErrorLayout()
-                errorTypeClassifier.isServerError(it) -> showServerErrorLayout()
-                else -> showErrorLayout()
+        // default handling process
+        val defaultHandling = {
+            // refreshing failed but we don't have previously loaded data.
+            val errorTypeClassifier = AndroidSword.errorClassifier
+            if (errorTypeClassifier != null) {
+                when {
+                    errorTypeClassifier.isNetworkError(it) -> showNetErrorLayout()
+                    errorTypeClassifier.isServerError(it) -> showServerErrorLayout()
+                    else -> showErrorLayout()
+                }
+            } else {
+                showErrorLayout()
             }
-        } else {
-            showErrorLayout()
         }
+        // your custom handling process
+        stateHandler.onError?.also {
+            // always dispatch error.
+            HandingProcedure(defaultHandling).it(error, isEmpty)
+        } ?: defaultHandling()
     }
 }

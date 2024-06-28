@@ -7,6 +7,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import com.android.base.core.AndroidSword
+import com.android.base.fragment.tool.HandingProcedure
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.PagingHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
@@ -16,25 +17,26 @@ import kotlinx.coroutines.launch
 
 class PagingDataHandlerBuilder<T : Any> internal constructor() {
 
-    internal var onEmpty: (() -> Unit)? = null
-    internal var monopolizedEmptyHandler = false
-
-    internal var onRefreshError: ((isEmpty: Boolean, error: Throwable) -> Unit)? = null
-    internal var monopolizedRefreshErrorHandler = false
+    internal var onRefreshError: (HandingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
+    internal var onRefreshEmpty: (HandingProcedure.() -> Unit)? = null
+    internal var onRefreshCompleted: (HandingProcedure.() -> Unit)? = null
 
     internal var onLoadMoreError: ((error: Throwable) -> Unit)? = null
     internal var onLoadMoreCompleted: ((reachedEnd: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
-    fun onEmpty(monopolized: Boolean = false, action: () -> Unit) {
-        onEmpty = action
-        monopolizedEmptyHandler = monopolized
+    /** handle when the list is empty after a successful refreshing. */
+    fun onRefreshEmpty(action: HandingProcedure.() -> Unit) {
+        onRefreshEmpty = action
     }
 
-    fun onRefreshError(monopolized: Boolean = false, action: (isEmpty: Boolean, error: Throwable) -> Unit) {
+    fun onRefreshCompleted(action: HandingProcedure. () -> Unit) {
+        onRefreshCompleted = action
+    }
+
+    fun onRefreshError(action: HandingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
         onRefreshError = action
-        monopolizedRefreshErrorHandler = monopolized
     }
 
     fun onLoadMoreError(action: (error: Throwable) -> Unit) {
@@ -132,8 +134,8 @@ private fun PagingHost.handlePagingRefreshState(
         is LoadState.Error -> {
             // finished with an error
             val refreshError = refreshState.error
-            // default handing process
-            if (!pagingDataHandler.monopolizedRefreshErrorHandler) {
+            // default handling process
+            val defaultHandling = {
                 if (isEmpty) {
                     val errorTypeClassifier = AndroidSword.errorClassifier
                     if (errorTypeClassifier != null) {
@@ -149,22 +151,29 @@ private fun PagingHost.handlePagingRefreshState(
                     showContentLayout()
                 }
             }
-            // your custom handing process
-            pagingDataHandler.onRefreshError?.invoke(true, refreshError)
+            // your custom handling process
+            pagingDataHandler.onRefreshError?.also {
+                HandingProcedure(defaultHandling).it(true, refreshError)
+            } ?: defaultHandling()
             return
         }
 
         is LoadState.NotLoading -> {
             // finished with no error
-            if (isEmpty && !isRefreshing()) {
-                // default handing process
-                if (!pagingDataHandler.monopolizedEmptyHandler) {
-                    showEmptyLayout()
-                }
-                // your custom handing process
-                pagingDataHandler.onEmpty?.invoke()
+            if (isEmpty) {
+                // default handling process
+                val defaultHandling = { showEmptyLayout() }
+                // your custom handling process
+                pagingDataHandler.onRefreshEmpty?.also {
+                    HandingProcedure(defaultHandling).it()
+                } ?: defaultHandling()
             } else {
-                showContentLayout()
+                // default handling process
+                val defaultHandling = { showContentLayout() }
+                // your custom handling process
+                pagingDataHandler.onRefreshCompleted?.also {
+                    HandingProcedure(defaultHandling).it()
+                } ?: defaultHandling()
             }
             if (isRefreshing()) {
                 refreshCompleted()
