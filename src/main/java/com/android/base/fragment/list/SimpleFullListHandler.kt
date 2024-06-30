@@ -6,85 +6,35 @@ import com.android.base.core.AndroidSword
 import com.android.base.fragment.list.epoxy.BaseEpoxyListFragment
 import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
-import com.android.base.fragment.ui.AutoPaging
 import com.android.base.fragment.ui.ListLayoutHost
-import com.android.base.fragment.ui.Paging
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** A builder for [ListStateHelper] working with [SimpleListState]. */
-@Suppress("FunctionName")
-fun <T> SimpleListStateHelper(
-    state: MutableStateFlow<SimpleListState<T>> = MutableStateFlow(SimpleListState()),
-    @HasMoreCheckMode checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    paging: Paging = AutoPaging(initialSize = state.value.data.size),
-): ListStateHelper<T, SimpleListState<T>> {
-    return ListStateHelper(state, checkMode, paging)
-}
+interface ListState<T, LS : ListState<T, LS>> {
 
-/** A class used to multiple the state of a list. */
-class ListStateHelper<T, LS : ListState<T, LS>>(
-    val state: MutableStateFlow<LS>,
-    @HasMoreCheckMode val checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    val paging: Paging = AutoPaging(initialSize = state.value.data.size),
-) {
+    val data: List<T>
 
-    fun updateToRefreshing() {
-        state.update {
-            it.toRefreshing()
-        }
-    }
+    val isRefreshing: Boolean
+    val refreshError: Throwable?
 
-    fun updateToLoadingMore() {
-        state.update {
-            it.toLoadingMore()
-        }
-    }
+    val isLoadingMore: Boolean
+    val loadMoreError: Throwable?
+    val hasMore: Boolean
 
-    fun updateToRefreshError(error: Throwable) {
-        state.update {
-            it.toRefreshError(error)
-        }
-    }
+    fun toRefreshing(): LS
 
-    fun updateToLoadMoreError(error: Throwable) {
-        state.update {
-            it.toLoadMoreError(error)
-        }
-    }
+    fun toLoadingMore(): LS
 
-    fun replaceListAndUpdate(list: List<T>, hasMore: Boolean) {
-        paging.onPageRefreshed(list.size)
-        state.update { it.replaceList(list, hasMore) }
-    }
+    fun toRefreshError(refreshError: Throwable): LS
 
-    fun appendListAndUpdate(list: List<T>, hasMore: Boolean) {
-        paging.onPageAppended(list.size)
-        state.update { it.appendList(list, hasMore) }
-    }
+    fun toLoadMoreError(loadMoreError: Throwable): LS
 
-    fun replaceListAndUpdate(list: List<T>) {
-        paging.onPageRefreshed(list.size)
-        state.update { it.replaceList(list, hasMore(list)) }
-    }
+    fun replaceList(list: List<T>, hasMore: Boolean): LS
 
-    fun appendListAndUpdate(list: List<T>) {
-        paging.onPageAppended(list.size)
-        state.update { it.appendList(list, hasMore(list)) }
-    }
-
-    private fun hasMore(list: List<T>): Boolean {
-        return if (checkMode == HasMoreCheckMode.BY_PAGE_SIZE) {
-            paging.hasMore(list.size)
-        } else {
-            list.isNotEmpty()
-        }
-    }
+    fun appendList(list: List<T>, hasMore: Boolean): LS
 
 }
 
