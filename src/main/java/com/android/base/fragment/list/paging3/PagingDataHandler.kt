@@ -1,16 +1,14 @@
 package com.android.base.fragment.list.paging3
 
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.PagingDataAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.tool.HandlingProcedure
-import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
-import com.android.base.fragment.ui.PagingHost
+import com.android.base.fragment.ui.PagingLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -55,42 +53,39 @@ class PagingDataHandlerBuilder<T : Any> internal constructor() {
 /**
  * This extension is used to help [BasePagingFragment] or [BasePagingDialogFragment] handle paging data.
  */
-fun <H, T : Any> H.handlePagingDataWithViewLifecycle(
-    activeState: Lifecycle.State = Lifecycle.State.STARTED,
+context(CoroutineScope)
+fun <T : Any> PagingLayoutHost.handlePagingData(
     adapter: PagingDataAdapter<T, *>,
     data: Flow<PagingData<T>>,
-) where H : PagingHost, H : Fragment {
-    handlePagingDataWithViewLifecycle(activeState, adapter, data) {
-        // nothing to do.
-    }
+) {
+    handlePagingData(adapter, data) {}
 }
 
 /**
  * This extension is used to help [BasePagingFragment] or [BasePagingDialogFragment] handle paging data.
  */
-fun <H, T : Any> H.handlePagingDataWithViewLifecycle(
-    activeState: Lifecycle.State = Lifecycle.State.STARTED,
+context(CoroutineScope)
+fun <T : Any> PagingLayoutHost.handlePagingData(
     adapter: PagingDataAdapter<T, *>,
     data: Flow<PagingData<T>>,
     handlerBuilder: PagingDataHandlerBuilder<T>.() -> Unit,
-) where H : PagingHost, H : Fragment {
+) {
     val pagingDataHandler = PagingDataHandlerBuilder<T>().apply(handlerBuilder)
 
-    runRepeatedlyOnViewLifecycle(activeState) {
-        launch {
-            data.collectLatest {
-                adapter.submitData(it)
-            }
+    launch {
+        data.collectLatest {
+            adapter.submitData(it)
         }
-        launch {
-            adapter.loadStateFlow.collectLatest {
-                handleLoadState(adapter, it, pagingDataHandler)
-            }
+    }
+
+    launch {
+        adapter.loadStateFlow.collectLatest {
+            handleLoadState(adapter, it, pagingDataHandler)
         }
     }
 }
 
-private fun PagingHost.handleLoadState(
+private fun PagingLayoutHost.handleLoadState(
     adapter: PagingDataAdapter<*, *>,
     loadStates: CombinedLoadStates,
     pagingDataHandler: PagingDataHandlerBuilder<*>,
@@ -117,7 +112,7 @@ private fun handlePagingLoadMoreState(append: LoadState, pagingDataHandler: Pagi
     }
 }
 
-private fun PagingHost.handlePagingRefreshState(
+private fun PagingLayoutHost.handlePagingRefreshState(
     refreshState: LoadState,
     isEmpty: Boolean,
     pagingDataHandler: PagingDataHandlerBuilder<*>,

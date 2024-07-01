@@ -3,11 +3,11 @@ package com.android.base.fragment.list
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.list.segment.BaseListFragment
 import com.android.base.fragment.tool.HandlingProcedure
-import com.android.base.fragment.ui.ListLayoutHost
+import com.android.base.fragment.ui.SegmentedListLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 
 /** @see BaseListFragment */
-fun ListLayoutHost<*>.handleListStartRefresh(
+fun SegmentedListLayoutHost<*, *>.handleListStartRefresh(
     showContentLoadingWhenEmpty: Boolean = !internalRetryByAutoRefresh,
 ) {
     if (isLoadingMore()) {
@@ -25,14 +25,54 @@ fun ListLayoutHost<*>.handleListStartRefresh(
 }
 
 /** @see BaseListFragment */
-fun ListLayoutHost<*>.handleListStartLoadMore() {
+fun SegmentedListLayoutHost<*, *>.handleListStartLoadMore() {
     if (isRefreshing()) {
         refreshCompleted()
     }
 }
 
 /** @see [BaseListFragment] */
-fun <D> ListLayoutHost<D>.handleListData(
+fun <D, Key : Any> SegmentedListLayoutHost<D, Key>.handleListData(
+    list: List<D>?,
+    nextPageKey: Key,
+    onEmpty: (HandlingProcedure.() -> Unit)? = null,
+    hasMore: ((List<D>) -> Boolean)? = null,
+) {
+    if (isLoadingMore()) {
+        if (!list.isNullOrEmpty()) {
+            addData(list)
+            paging.onPageAppended(nextPageKey)
+        }
+    } else {
+        replaceData(list ?: emptyList())
+        if (isRefreshEnable && isRefreshing()) {
+            refreshCompleted()
+            paging.onPageRefreshed(nextPageKey)
+        }
+    }
+
+    if (isLoadMoreEnable) {
+        if (hasMore == null) {
+            loadMoreCompleted(list != null && paging.hasMore(list.size))
+        } else {
+            loadMoreCompleted(list != null && hasMore(list))
+        }
+    }
+
+    if (isEmpty()) {
+        // default handling process
+        val defaultHandling = { showEmptyLayout() }
+        // your custom handling process
+        onEmpty?.also {
+            HandlingProcedure(defaultHandling).it()
+        } ?: defaultHandling()
+    } else {
+        showContentLayout()
+    }
+}
+
+/** @see [BaseListFragment] */
+fun <D> SegmentedListLayoutHost<D, Int>.handleListData(
     list: List<D>?,
     onEmpty: (HandlingProcedure.() -> Unit)? = null,
     hasMore: ((List<D>) -> Boolean)? = null,
@@ -40,11 +80,16 @@ fun <D> ListLayoutHost<D>.handleListData(
     if (isLoadingMore()) {
         if (!list.isNullOrEmpty()) {
             addData(list)
+            paging.onPageAppended(list.size)
         }
     } else {
         replaceData(list ?: emptyList())
         if (isRefreshEnable && isRefreshing()) {
             refreshCompleted()
+            paging.onPageRefreshed(
+                /* We pass the loaded list size as the key, but for [AutoPaging], this parameter will just be ignored. */
+                list?.size ?: 0
+            )
         }
     }
 
@@ -69,7 +114,7 @@ fun <D> ListLayoutHost<D>.handleListData(
 }
 
 /** @see BaseListFragment */
-fun ListLayoutHost<*>.handleListError(throwable: Throwable) {
+fun SegmentedListLayoutHost<*, *>.handleListError(throwable: Throwable) {
     if (isRefreshEnable && isRefreshing()) {
         refreshCompleted()
     }

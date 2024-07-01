@@ -1,12 +1,8 @@
 package com.android.base.fragment.ui
 
-import com.android.base.adapter.DataManager
-
 interface ListDataHost<T> {
 
-    fun replaceData(data: List<T>)
-
-    fun addData(data: List<T>)
+    fun submitData(data: List<T>)
 
     fun isEmpty(): Boolean
 
@@ -19,8 +15,6 @@ interface ListDataHost<T> {
  */
 interface ListLayoutHost<T> : StateLayoutHost, ListDataHost<T> {
 
-    val paging: Paging
-
     fun loadMoreCompleted(hasMore: Boolean)
 
     fun loadMoreFailed()
@@ -31,28 +25,4 @@ interface ListLayoutHost<T> : StateLayoutHost, ListDataHost<T> {
 
     var isLoadMoreEnable: Boolean
 
-}
-
-fun <T> DataManager<T>.toListDataHost(): ListDataHost<T> {
-    return object : ListDataHost<T> {
-        override fun replaceData(data: List<T>) {
-            replaceAll(data)
-        }
-
-        override fun addData(data: List<T>) {
-            addItems(data)
-        }
-
-        override fun isEmpty(): Boolean {
-            return this@toListDataHost.isEmpty()
-        }
-
-        override fun getListSize(): Int {
-            return getDataSize()
-        }
-    }
-}
-
-fun <T> ListLayoutHost<T>.getLoadingPage(): Int {
-    return paging.getLoadingPage(isRefreshing() || !isLoadingMore())
 }

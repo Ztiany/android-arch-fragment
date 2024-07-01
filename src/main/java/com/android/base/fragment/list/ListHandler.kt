@@ -1,13 +1,11 @@
 package com.android.base.fragment.list
 
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.list.epoxy.BaseEpoxyListFragment
 import com.android.base.fragment.tool.HandlingProcedure
-import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -72,51 +70,45 @@ class ListStateHandlerBuilder internal constructor() {
 /**
  * @see BaseEpoxyListFragment
  */
-fun <H, T> H.handleListStateWithViewLifecycle(
-    activeState: Lifecycle.State = Lifecycle.State.STARTED,
-    data: Flow<ListState<T, *>>,
-) where H : ListLayoutHost<T>, H : Fragment {
-    handleListStateWithViewLifecycle(activeState, data) {
-        // nothing to do.
-    }
+context(CoroutineScope)
+fun <T> ListLayoutHost<T>.handleListState(data: Flow<ListState<T, *>>) {
+    handleListState(data) {}
 }
 
 /**
  * @see BaseEpoxyListFragment
  */
-fun <H, T> H.handleListStateWithViewLifecycle(
-    activeState: Lifecycle.State = Lifecycle.State.STARTED,
+context(CoroutineScope)
+fun <T> ListLayoutHost<T>.handleListState(
     data: Flow<ListState<T, *>>,
     handlerBuilder: ListStateHandlerBuilder.() -> Unit,
-) where H : ListLayoutHost<T>, H : Fragment {
+) {
 
     val listHandler = ListStateHandlerBuilder().apply(handlerBuilder)
 
-    runRepeatedlyOnViewLifecycle(activeState) {
-        // handling data
-        launch {
-            data.map { it.data }
-                .distinctUntilChanged()
-                .collect {
-                    replaceData(it)
-                }
-        }
-        // handling refresh state
-        launch {
-            data.map { Pair(it.isRefreshing, it.refreshError) }
-                .distinctUntilChanged()
-                .collect {
-                    handleRefreshState(it, listHandler)
-                }
-        }
-        // handling load more state
-        launch {
-            data.map { Triple(it.isLoadingMore, it.hasMore, it.loadMoreError) }
-                .distinctUntilChanged()
-                .collect {
-                    handleLoadingMoreState(it, listHandler)
-                }
-        }
+    // handling data
+    launch {
+        data.map { it.data }
+            .distinctUntilChanged()
+            .collect {
+                submitData(it)
+            }
+    }
+    // handling refresh state
+    launch {
+        data.map { Pair(it.isRefreshing, it.refreshError) }
+            .distinctUntilChanged()
+            .collect {
+                handleRefreshState(it, listHandler)
+            }
+    }
+    // handling load more state
+    launch {
+        data.map { Triple(it.isLoadingMore, it.hasMore, it.loadMoreError) }
+            .distinctUntilChanged()
+            .collect {
+                handleLoadingMoreState(it, listHandler)
+            }
     }
 }
 

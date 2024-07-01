@@ -43,23 +43,14 @@ data class SimpleListState<T>(
 
 }
 
-/** A builder for [ListStateHelper] working with [SimpleListState]. */
-@Suppress("FunctionName")
-fun <T> SimpleListStateHelper(
-    state: MutableStateFlow<SimpleListState<T>> = MutableStateFlow(SimpleListState()),
-    @HasMoreCheckMode checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    paging: Paging = AutoPaging(initialSize = state.value.data.size),
-): ListStateHelper<T, SimpleListState<T>> {
-    return ListStateHelper(state, checkMode, paging)
-}
-
-
-/** A class used to multiple the state of a list. */
-class ListStateHelper<T, LS : ListState<T, LS>>(
+/** A class used to work with [ListState]. */
+class AutoPagingListStateHelper<T, LS : ListState<T, LS>>(
     val state: MutableStateFlow<LS>,
-    @HasMoreCheckMode val checkMode: Int = HasMoreCheckMode.BY_PAGE_SIZE,
-    val paging: Paging = AutoPaging(initialSize = state.value.data.size),
 ) {
+
+    private val _paging = AutoPaging()
+    val paging: Paging<Int>
+        get() = _paging
 
     fun updateToRefreshing() {
         state.update {
@@ -86,31 +77,35 @@ class ListStateHelper<T, LS : ListState<T, LS>>(
     }
 
     fun replaceListAndUpdate(list: List<T>, hasMore: Boolean) {
+        /* We pass the loaded list size as the key, but for [AutoPaging], this parameter will just be ignored. */
         paging.onPageRefreshed(list.size)
         state.update { it.replaceList(list, hasMore) }
     }
 
     fun appendListAndUpdate(list: List<T>, hasMore: Boolean) {
+        /* We pass the loaded list size as the key, but for [AutoPaging], this parameter will just be ignored. */
         paging.onPageAppended(list.size)
         state.update { it.appendList(list, hasMore) }
     }
 
     fun replaceListAndUpdate(list: List<T>) {
+        /* We pass the loaded list size as the key, but for [AutoPaging], this parameter will just be ignored. */
         paging.onPageRefreshed(list.size)
-        state.update { it.replaceList(list, hasMore(list)) }
+        state.update { it.replaceList(list, paging.hasMore(list.size)) }
     }
 
     fun appendListAndUpdate(list: List<T>) {
+        /* We pass the loaded list size as the key, but for [AutoPaging], this parameter will just be ignored. */
         paging.onPageAppended(list.size)
-        state.update { it.appendList(list, hasMore(list)) }
+        state.update { it.appendList(list, paging.hasMore(list.size)) }
     }
 
-    private fun hasMore(list: List<T>): Boolean {
-        return if (checkMode == HasMoreCheckMode.BY_PAGE_SIZE) {
-            paging.hasMore(list.size)
-        } else {
-            list.isNotEmpty()
-        }
-    }
+}
 
+/** A builder for [AutoPagingListStateHelper] working with [SimpleListState]. */
+@Suppress("FunctionName")
+fun <T> SimpleListStateHelper(
+    state: MutableStateFlow<SimpleListState<T>> = MutableStateFlow(SimpleListState()),
+): AutoPagingListStateHelper<T, SimpleListState<T>> {
+    return AutoPagingListStateHelper(state)
 }

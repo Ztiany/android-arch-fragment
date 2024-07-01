@@ -84,7 +84,7 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
 /**
  * This extension function facilitates state management for components like [BaseStateFragment] or [BaseStateDialogFragment].
  *
- * > Note: With the introduction of [handleDataState], usage of this extension is discouraged.
+ * > Note: With the introduction of [handleFlowDataState], usage of this extension is discouraged.
  *
  * Example usage:
  *
@@ -129,6 +129,7 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
  * }
  * ```
  */
+@Deprecated("Please use handleFlowDataState instead.")
 fun <L, D, E> StateLayoutHost.handleState(
     state: State<L, D, E>,
     handler: StateHandlerBuilder<L, D, E>.() -> Unit,

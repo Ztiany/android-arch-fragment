@@ -54,3 +54,15 @@ fun calculatePageNumber(total: Int, pagingSize: Int, pagingStart: Int): Int {
 fun calculateNextPageNumber(total: Int, pagingSize: Int, pagingStart: Int): Int {
     return calculatePageNumber(total, pagingSize, pagingStart) + 1
 }
+
+fun Paging<Int>.getLoadingPage(isRefresh: Boolean): Int {
+    return if (isRefresh) {
+        start
+    } else {
+        next
+    }
+}
+
+fun <T> SegmentedListLayoutHost<T, Int>.getLoadingPage(): Int {
+    return paging.getLoadingPage(isRefreshing() || !isLoadingMore())
+}

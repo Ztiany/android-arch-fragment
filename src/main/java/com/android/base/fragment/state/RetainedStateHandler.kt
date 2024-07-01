@@ -5,6 +5,11 @@ import com.android.base.core.AndroidSword
 import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 interface DataState<T> {
     val data: T?
@@ -56,6 +61,7 @@ class DataStateHandlerBuilder<D> internal constructor() {
 
 }
 
+
 /**
  * Like its name "Retained State", we should handle the state in a retained way. Your code in your [ViewModel] may be
  * like this:
@@ -71,7 +77,7 @@ class DataStateHandlerBuilder<D> internal constructor() {
  *     private val terminalList = selectedMerchant
  *         .flatMapMerge (1){
  *             loadTerminalList1(it.merchant)
- *         }.runningFold(SimpleDataState<List<Any>>(isRefreshing = true)) { accumulator, value ->
+ *         }.scan(SimpleDataState<List<Any>>(isRefreshing = true)) { accumulator, value ->
  *             // always dispatch the latest data
  *             if (value.data == null) {
  *                 value.copy(accumulator.data)
@@ -94,24 +100,34 @@ class DataStateHandlerBuilder<D> internal constructor() {
  * then handle data in your [BaseStateFragment] or [BaseStateDialogFragment]:
  *
  * ```
- * class ProtocolFragment : BaseStateFragment<ProtocolFragmentBinding>() {
+ * class ArticleFragment : BaseStateFragment<ArticleFragmentBinding>() {
  *
- *     private fun subscribeViewModel() {
- *          viewModel.protocolContentState.observe(this) {
- *             handleDataState(it) {
- *                 onResult { data ->
- *                     vb.protocolView.setProtocol(data.content)
- *                 }
+ *    override fun onViewPrepared(view: View, savedInstanceState: Bundle?) = runRepeatedlyOnViewLifecycle {
+ *         stateLayoutController.handleFlowDataState(viewModel.articles) {
+ *             onResult { list ->
+ *                 articleAdapter.replaceAll(list)
  *             }
- *          }
- *      }
+ *         }
+ *     }
  *
  * }
  * ```
  *
  * @see BaseStateFragment
  */
-fun <D> StateLayoutHost.handleDataState(
+context(CoroutineScope)
+fun <D> StateLayoutHost.handleFlowDataState(
+    flowData: Flow<DataState<D>>,
+    handler: DataStateHandlerBuilder<D>.() -> Unit,
+) {
+    launch {
+        flowData.onEach {
+            handleDataState(it, handler)
+        }.collect()
+    }
+}
+
+private fun <D> StateLayoutHost.handleDataState(
     state: DataState<D>,
     handler: DataStateHandlerBuilder<D>.() -> Unit,
 ) {

@@ -26,16 +26,8 @@ abstract class ListEpoxyController<T> : TypedEpoxyController<List<T>>(), ListDat
 
     abstract fun buildListModels(data: List<T>)
 
-    override fun replaceData(data: List<T>) {
+    override fun submitData(data: List<T>) {
         setData(data)
-    }
-
-    override fun addData(data: List<T>) {
-        Timber.e("You should not call this method, use replaceData instead.")
-        val currentData: MutableList<T> = currentData?.toMutableList() ?: mutableListOf()
-        currentData.removeAll(data)
-        currentData.addAll(data)
-        setData(currentData)
     }
 
     override fun isEmpty(): Boolean {

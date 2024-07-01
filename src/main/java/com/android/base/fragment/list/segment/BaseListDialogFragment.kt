@@ -5,13 +5,16 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.viewbinding.ViewBinding
+import com.android.base.adapter.DataManager
+import com.android.base.adapter.recycler.segment.BaseRecyclerAdapter
 import com.android.base.core.AndroidSword
 import com.android.base.fragment.base.BaseUIDialogFragment
 import com.android.base.fragment.ui.CommonId
-import com.android.base.fragment.ui.ListDataHost
-import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.Paging
+import com.android.base.fragment.ui.SegmentedListDataHost
+import com.android.base.fragment.ui.SegmentedListLayoutHost
 import com.android.base.fragment.ui.StateLayoutConfig
+import com.android.base.fragment.ui.toSegmentedListDataHost
 import com.ztiany.loadmore.adapter.LoadMoreAdapter
 import com.ztiany.loadmore.adapter.LoadMoreController
 import kotlin.properties.Delegates
@@ -20,11 +23,11 @@ import kotlin.properties.Delegates
  * @author Ztiany
  * @see [BaseListFragment]
  */
-abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragment<VB>(), ListLayoutHost<T> {
+abstract class BaseListDialogFragment<T, PageKey : Any, VB : ViewBinding> : BaseUIDialogFragment<VB>() {
 
     private var loadMoreImpl: LoadMoreController? = null
 
-    private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
+    private var listLayoutHostImpl: SegmentedListLayoutHost<T, PageKey> by Delegates.notNull()
 
     override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
@@ -32,9 +35,9 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should invoke [setUpList] to return a real [ListLayoutHost].
+     *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
-    abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): ListLayoutHost<T>
+    abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, PageKey>
 
     /**
      * Call this method before calling to [setUpList]. And assign [RecyclerView]'s [Adapter] with the return value.
@@ -48,10 +51,16 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
         }
     }
 
-    protected fun setUpList(listDataHost: ListDataHost<T>): ListLayoutHost<T> {
-        return buildListLayoutHost(
+    /**
+     * For parameter [listDataHost] Usually, It's implemented by your [RecyclerView.Adapter]. If your Adapter has
+     * implemented [DataManager] life [BaseRecyclerAdapter], you can use [toSegmentedListDataHost] to convert your
+     * Adapter to a [SegmentedListDataHost].
+     */
+    protected fun setUpList(listDataHost: SegmentedListDataHost<T>, paging: Paging<PageKey>): SegmentedListLayoutHost<T, PageKey> {
+        return buildSegmentedListLayoutHost(
             listDataHost,
             loadMoreImpl,
+            paging,
             vb.root.findViewById(CommonId.STATE_ID),
             vb.root.findViewById(CommonId.REFRESH_ID)
         ) {
@@ -69,7 +78,7 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
 
     protected open fun onRetry(@StateLayoutConfig.RetryableState state: Int) {
         if (listLayoutHostImpl.isRefreshEnable) {
-            if (!isRefreshing()) {
+            if (!listLayoutHostImpl.isRefreshing()) {
                 listLayoutHostImpl.autoRefresh()
             }
         } else {
@@ -81,117 +90,13 @@ abstract class BaseListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFragmen
 
     protected open fun onLoadMore() {}
 
-    override fun replaceData(data: List<T>) = listLayoutHostImpl.replaceData(data)
-
-    override fun addData(data: List<T>) = listLayoutHostImpl.addData(data)
-
-    override fun isEmpty(): Boolean {
-        return listLayoutHostImpl.isEmpty()
-    }
-
-    override fun getListSize(): Int {
-        return listLayoutHostImpl.getListSize()
-    }
-
-    override fun isLoadingMore(): Boolean {
-        return listLayoutHostImpl.isLoadingMore()
-    }
-
-    override fun setLoadingMore() {
-        listLayoutHostImpl.setLoadingMore()
-    }
-
-    override fun setRefreshing() {
-        listLayoutHostImpl.setRefreshing()
-    }
-
-    override fun isRefreshing(): Boolean {
-        return listLayoutHostImpl.isRefreshing()
-    }
-
-    override val paging: Paging
-        get() = listLayoutHostImpl.paging
-
-    val loadMoreController: LoadMoreController
+    protected val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")
 
-    override fun loadMoreCompleted(hasMore: Boolean) {
-        loadMoreImpl?.loadCompleted(hasMore)
-    }
+    protected val listLayoutController: SegmentedListLayoutHost<T, PageKey>
+        get() = listLayoutHostImpl
 
-    override fun loadMoreFailed() {
-        loadMoreImpl?.loadFail()
-    }
-
-    override var isLoadMoreEnable: Boolean
-        get() = listLayoutHostImpl.isLoadMoreEnable
-        set(value) {
-            listLayoutHostImpl.isLoadMoreEnable = value
-        }
-
-    override fun autoRefresh() {
-        listLayoutHostImpl.autoRefresh()
-    }
-
-    override fun refreshCompleted() {
-        listLayoutHostImpl.refreshCompleted()
-    }
-
-    override fun showContentLayout() {
-        listLayoutHostImpl.showContentLayout()
-    }
-
-    override fun showLoadingLayout() {
-        listLayoutHostImpl.showLoadingLayout()
-    }
-
-    override fun showEmptyLayout() {
-        listLayoutHostImpl.showEmptyLayout()
-    }
-
-    override fun showErrorLayout() {
-        listLayoutHostImpl.showErrorLayout()
-    }
-
-    override fun showRequesting() {
-        listLayoutHostImpl.showRequesting()
-    }
-
-    override fun showBlank() {
-        listLayoutHostImpl.showBlank()
-    }
-
-    override fun showNetErrorLayout() {
-        listLayoutHostImpl.showNetErrorLayout()
-    }
-
-    override fun showServerErrorLayout() {
-        listLayoutHostImpl.showServerErrorLayout()
-    }
-
-    override fun getStateLayoutConfig(): StateLayoutConfig {
-        return listLayoutHostImpl.stateLayoutConfig
-    }
-
-    @StateLayoutConfig.ViewState
-    override fun currentStatus(): Int {
-        return listLayoutHostImpl.currentStatus()
-    }
-
-    override var isRefreshEnable: Boolean
-        get() = listLayoutHostImpl.isRefreshEnable
-        set(value) {
-            listLayoutHostImpl.isRefreshEnable = value
-        }
-
-    @Suppress("UNUSED")
-    companion object {
-        const val CONTENT = StateLayoutConfig.CONTENT
-        const val LOADING = StateLayoutConfig.LOADING
-        const val ERROR = StateLayoutConfig.ERROR
-        const val EMPTY = StateLayoutConfig.EMPTY
-        const val NET_ERROR = StateLayoutConfig.NET_ERROR
-        const val SERVER_ERROR = StateLayoutConfig.SERVER_ERROR
-    }
+    protected val paging: Paging<PageKey>
+        get() = listLayoutHostImpl.paging
 
 }
