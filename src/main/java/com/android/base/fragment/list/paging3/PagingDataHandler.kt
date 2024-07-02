@@ -15,33 +15,33 @@ import kotlinx.coroutines.launch
 
 class PagingDataHandlerBuilder<T : Any> internal constructor() {
 
-    internal var onRefreshError: (HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
-    internal var onRefreshEmpty: (HandlingProcedure.() -> Unit)? = null
-    internal var onRefreshCompleted: (HandlingProcedure.() -> Unit)? = null
+    internal var onRefreshError: (suspend HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
+    internal var onRefreshEmpty: (suspend HandlingProcedure.() -> Unit)? = null
+    internal var onRefreshCompleted: (suspend HandlingProcedure.() -> Unit)? = null
 
-    internal var onLoadMoreError: ((error: Throwable) -> Unit)? = null
-    internal var onLoadMoreCompleted: ((reachedEnd: Boolean) -> Unit)? = null
+    internal var onLoadMoreError: (suspend (error: Throwable) -> Unit)? = null
+    internal var onLoadMoreCompleted: (suspend (reachedEnd: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
     /** handle when the list is empty after a successful refreshing. */
-    fun onRefreshEmpty(action: HandlingProcedure.() -> Unit) {
+    fun onRefreshEmpty(action: suspend HandlingProcedure.() -> Unit) {
         onRefreshEmpty = action
     }
 
-    fun onRefreshCompleted(action: HandlingProcedure. () -> Unit) {
+    fun onRefreshCompleted(action: suspend HandlingProcedure. () -> Unit) {
         onRefreshCompleted = action
     }
 
-    fun onRefreshError(action: HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
+    fun onRefreshError(action: suspend HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
         onRefreshError = action
     }
 
-    fun onLoadMoreError(action: (error: Throwable) -> Unit) {
+    fun onLoadMoreError(action: suspend (error: Throwable) -> Unit) {
         onLoadMoreError = action
     }
 
-    fun onLoadMoreCompleted(action: (reachedEnd: Boolean) -> Unit) {
+    fun onLoadMoreCompleted(action: suspend (reachedEnd: Boolean) -> Unit) {
         onLoadMoreCompleted = action
     }
 
@@ -85,7 +85,7 @@ fun <T : Any> PagingLayoutHost.handlePagingData(
     }
 }
 
-private fun PagingLayoutHost.handleLoadState(
+private suspend fun PagingLayoutHost.handleLoadState(
     adapter: PagingDataAdapter<*, *>,
     loadStates: CombinedLoadStates,
     pagingDataHandler: PagingDataHandlerBuilder<*>,
@@ -95,7 +95,7 @@ private fun PagingLayoutHost.handleLoadState(
     handlePagingLoadMoreState(loadStates.append, pagingDataHandler)
 }
 
-private fun handlePagingLoadMoreState(append: LoadState, pagingDataHandler: PagingDataHandlerBuilder<*>) {
+private suspend fun handlePagingLoadMoreState(append: LoadState, pagingDataHandler: PagingDataHandlerBuilder<*>) {
     when (append) {
         is LoadState.Loading -> {
             // do nothing
@@ -112,7 +112,7 @@ private fun handlePagingLoadMoreState(append: LoadState, pagingDataHandler: Pagi
     }
 }
 
-private fun PagingLayoutHost.handlePagingRefreshState(
+private suspend fun PagingLayoutHost.handlePagingRefreshState(
     refreshState: LoadState,
     isEmpty: Boolean,
     pagingDataHandler: PagingDataHandlerBuilder<*>,

@@ -10,29 +10,32 @@ import kotlinx.coroutines.launch
 /**
  *@author Ztiany
  */
-internal fun <T> T.dismissDialog(recentShowingDialogTime: Long, minimumMills: Long, onDismiss: (() -> Unit)?) where T : LoadingViewHost, T : LifecycleOwner {
+internal fun <T> T.dismissDialog(
+    lastShowTime: Long,
+    minimumMills: Long,
+    onDismiss: (() -> Unit)?,
+) where T : LoadingViewHost, T : LifecycleOwner {
 
     if (!isLoadingDialogShowing()) {
         onDismiss?.invoke()
         return
     }
 
-    val dialogShowingTime = System.currentTimeMillis() - recentShowingDialogTime
+    val dialogShowingTime = System.currentTimeMillis() - lastShowTime
 
     if (dialogShowingTime >= minimumMills) {
         dismissLoadingDialog()
         onDismiss?.invoke()
-
-    } else {
-        lifecycleScope.launch {
-            try {
-                delay(minimumMills - dialogShowingTime)
-                dismissLoadingDialog()
-                onDismiss?.invoke()
-            } catch (e: CancellationException) {
-                onDismiss?.invoke()
-            }
-        }
+        return
     }
 
+    lifecycleScope.launch {
+        try {
+            delay(minimumMills - dialogShowingTime)
+            dismissLoadingDialog()
+            onDismiss?.invoke()
+        } catch (e: CancellationException) {
+            onDismiss?.invoke()
+        }
+    }
 }

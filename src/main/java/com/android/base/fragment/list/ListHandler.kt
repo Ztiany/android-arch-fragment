@@ -38,27 +38,27 @@ interface ListState<T, LS : ListState<T, LS>> {
 
 class ListStateHandlerBuilder internal constructor() {
 
-    internal var onRefreshEmpty: (HandlingProcedure.() -> Unit)? = null
-    internal var onRefreshCompleted: (HandlingProcedure.() -> Unit)? = null
-    internal var onRefreshError: (HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
+    internal var onRefreshEmpty: (suspend HandlingProcedure.() -> Unit)? = null
+    internal var onRefreshCompleted: (suspend HandlingProcedure.() -> Unit)? = null
+    internal var onRefreshError: (suspend HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit)? = null
 
-    internal var onLoadMoreError: ((error: Throwable) -> Unit)? = null
-    internal var onLoadMoreCompleted: ((reachedEnd: Boolean) -> Unit)? = null
+    internal var onLoadMoreError: (suspend (error: Throwable) -> Unit)? = null
+    internal var onLoadMoreCompleted: (suspend (reachedEnd: Boolean) -> Unit)? = null
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
-    fun onOnRefreshResultEmpty(action: HandlingProcedure.() -> Unit) {
+    fun onOnRefreshResultEmpty(action: suspend HandlingProcedure.() -> Unit) {
         onRefreshEmpty = action
     }
 
-    fun onOnRefreshCompleted(action: HandlingProcedure.() -> Unit) {
+    fun onOnRefreshCompleted(action: suspend HandlingProcedure.() -> Unit) {
         onRefreshCompleted = action
     }
 
-    fun onRefreshError(action: HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
+    fun onRefreshError(action: suspend HandlingProcedure.(isEmpty: Boolean, error: Throwable) -> Unit) {
         onRefreshError = action
     }
 
-    fun onLoadMoreError(action: (error: Throwable) -> Unit) {
+    fun onLoadMoreError(action: suspend (error: Throwable) -> Unit) {
         onLoadMoreError = action
     }
 
@@ -112,7 +112,7 @@ fun <T> ListLayoutHost<T>.handleListState(
     }
 }
 
-private fun <T> ListLayoutHost<T>.handleRefreshState(
+private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
     refreshState: Pair<Boolean/*is refreshing*/, Throwable?>,
     listStateHandler: ListStateHandlerBuilder,
 ) {
@@ -177,7 +177,7 @@ private fun <T> ListLayoutHost<T>.handleRefreshState(
     }
 }
 
-private fun <T> ListLayoutHost<T>.handleLoadingMoreState(
+private suspend fun <T> ListLayoutHost<T>.handleLoadingMoreState(
     /* Triple<LoadingMore, hasMore, loadMoreError> */
     loadMoreState: Triple<Boolean, Boolean, Throwable?>,
     listHandler: ListStateHandlerBuilder,

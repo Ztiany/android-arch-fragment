@@ -28,7 +28,7 @@ import timber.log.Timber
  */
 open class BaseDialogFragment : AppCompatDialogFragment(), OnBackPressListener, FragmentDelegateOwner, LoadingViewHost {
 
-    private var recentShowingDialogTime: Long = 0
+    private var lastDialogShowTime: Long = 0
 
     private var loadingViewHost: LoadingViewHost? = null
 
@@ -194,22 +194,22 @@ open class BaseDialogFragment : AppCompatDialogFragment(), OnBackPressListener, 
     }
 
     override fun showLoadingDialog(): Dialog {
-        recentShowingDialogTime = System.currentTimeMillis()
+        lastDialogShowTime = System.currentTimeMillis()
         return loadingView().showLoadingDialog(true)
     }
 
     override fun showLoadingDialog(cancelable: Boolean): Dialog {
-        recentShowingDialogTime = System.currentTimeMillis()
+        lastDialogShowTime = System.currentTimeMillis()
         return loadingView().showLoadingDialog(cancelable)
     }
 
     override fun showLoadingDialog(message: CharSequence, cancelable: Boolean): Dialog {
-        recentShowingDialogTime = System.currentTimeMillis()
+        lastDialogShowTime = System.currentTimeMillis()
         return loadingView().showLoadingDialog(message, cancelable)
     }
 
     override fun showLoadingDialog(@StringRes messageId: Int, cancelable: Boolean): Dialog {
-        recentShowingDialogTime = System.currentTimeMillis()
+        lastDialogShowTime = System.currentTimeMillis()
         return loadingView().showLoadingDialog(messageId, cancelable)
     }
 
@@ -218,7 +218,7 @@ open class BaseDialogFragment : AppCompatDialogFragment(), OnBackPressListener, 
     }
 
     override fun dismissLoadingDialog(minimumMills: Long, onDismiss: (() -> Unit)?) {
-        dismissDialog(recentShowingDialogTime, minimumMills, onDismiss)
+        dismissDialog(lastDialogShowTime, minimumMills, onDismiss)
     }
 
     override fun isLoadingDialogShowing(): Boolean {

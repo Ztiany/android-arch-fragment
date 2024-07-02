@@ -27,11 +27,11 @@ data class SimpleDataState<T>(
 class DataStateHandlerBuilder<D> internal constructor() {
     internal var checker: DataChecker<D> = newDefaultChecker()
 
-    internal var onResult: ((D) -> Unit)? = null
+    internal var onResult: (suspend (D) -> Unit)? = null
 
-    internal var onEmpty: (HandlingProcedure.() -> Unit)? = null
-    internal var onError: (HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit)? = null
-    internal var onLoading: (HandlingProcedure.(isEmpty: Boolean) -> Unit)? = null
+    internal var onEmpty: (suspend HandlingProcedure.() -> Unit)? = null
+    internal var onError: (suspend HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit)? = null
+    internal var onLoading: (suspend HandlingProcedure.(isEmpty: Boolean) -> Unit)? = null
 
     internal var showContentLoadingWhenEmpty = !internalRetryByAutoRefresh
 
@@ -39,19 +39,19 @@ class DataStateHandlerBuilder<D> internal constructor() {
         checker = dataChecker
     }
 
-    fun onEmpty(action: HandlingProcedure. () -> Unit) {
+    fun onEmpty(action: suspend HandlingProcedure. () -> Unit) {
         onEmpty = action
     }
 
-    fun onError(action: HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit) {
+    fun onError(action: suspend HandlingProcedure.(error: Throwable, isEmpty: Boolean) -> Unit) {
         onError = action
     }
 
-    fun onResult(action: (D) -> Unit) {
+    fun onResult(action: suspend (D) -> Unit) {
         onResult = action
     }
 
-    fun onLoading(action: HandlingProcedure.(isEmpty: Boolean) -> Unit) {
+    fun onLoading(action: suspend HandlingProcedure.(isEmpty: Boolean) -> Unit) {
         onLoading = action
     }
 
@@ -127,14 +127,14 @@ fun <D> StateLayoutHost.handleFlowDataState(
     }
 }
 
-private fun <D> StateLayoutHost.handleDataState(
+private suspend fun <D> StateLayoutHost.handleDataState(
     state: DataState<D>,
     handler: DataStateHandlerBuilder<D>.() -> Unit,
 ) {
     val stateHandler = DataStateHandlerBuilder<D>().apply(handler)
 
     val data = state.data
-    val dispatchData = {
+    val dispatchData = suspend {
         data?.let {
             stateHandler.onResult?.invoke(it)
             showContentLayout()
