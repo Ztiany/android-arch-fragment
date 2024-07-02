@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.app.common.library)
-    alias(libs.plugins.jetbrains.kotlin.kapt)
+    alias(libs.plugins.google.ksp)
     alias(libs.plugins.vanniktech.maven.publisher)
 }
 
@@ -45,6 +45,6 @@ dependencies {
     api(libs.jakewharton.timber)
 
     // epoxy
-    api(libs.airbnb.epoxy)
-    kapt(libs.airbnb.epoxy.apt)
+    api(libs.airbnb.epoxy.core)
+    ksp(libs.airbnb.epoxy.processor)
 }
