@@ -127,7 +127,7 @@ fun <D> StateLayoutHost.handleFlowDataState(
     }
 }
 
-private suspend fun <D> StateLayoutHost.handleDataState(
+suspend fun <D> StateLayoutHost.handleDataState(
     state: DataState<D>,
     handler: DataStateHandlerBuilder<D>.() -> Unit,
 ) {
