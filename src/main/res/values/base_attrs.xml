@@ -26,9 +26,6 @@
     </declare-styleable>
 
     <declare-styleable name="SimpleMultiStateLayout">
-
-        <attr name="msl_state_processor" format="string" />
-
         <attr name="msl_errorImg" format="reference" />
         <attr name="msl_errorText" format="string" />
         <attr name="msl_errorAction" format="string" />

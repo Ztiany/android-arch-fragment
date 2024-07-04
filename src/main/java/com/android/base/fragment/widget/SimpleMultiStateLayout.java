@@ -8,7 +8,6 @@ import static com.android.base.fragment.ui.StateLayoutConfig.ViewState;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -18,14 +17,12 @@ import com.android.base.fragment.R;
 import com.android.base.fragment.ui.StateLayout;
 import com.android.base.fragment.ui.StateLayoutConfig;
 
-import timber.log.Timber;
-
 /**
  * @author Ztiany
  */
 public class SimpleMultiStateLayout extends MultiStateLayout implements StateLayout {
 
-    private StateProcessor mStateProcessor;
+    private final StateProcessor mStateProcessor;
 
     private StateListener mStateListener;
 
@@ -39,35 +36,16 @@ public class SimpleMultiStateLayout extends MultiStateLayout implements StateLay
 
     public SimpleMultiStateLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setListener();
+        setStateListener();
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleMultiStateLayout, defStyle, defStyle);
-        initProcessor(typedArray);
-
+        mStateProcessor = new StateActionProcessor();
         mStateProcessor.onInitialize(this);
         mStateProcessor.onParseAttrs(typedArray);
-
         typedArray.recycle();
     }
 
-    private void initProcessor(TypedArray typedArray) {
-        String processorPath = typedArray.getString(R.styleable.SimpleMultiStateLayout_msl_state_processor);
-
-        if (!TextUtils.isEmpty(processorPath)) {
-            try {
-                Class<?> processorClass = Class.forName(processorPath);
-                mStateProcessor = (StateProcessor) processorClass.newInstance();
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                Timber.e("initProcessor() called can not instance processor: %s", processorPath);
-            }
-        }
-
-        if (mStateProcessor == null) {
-            mStateProcessor = new StateActionProcessor();
-        }
-    }
-
-    private void setListener() {
+    private void setStateListener() {
         super.setStateListener(new StateListener() {
             @Override
             public void onStateChanged(@StateLayoutConfig.ViewState int viewState) {
@@ -78,10 +56,10 @@ public class SimpleMultiStateLayout extends MultiStateLayout implements StateLay
 
             @Override
             public void onStateInflated(@StateLayoutConfig.ViewState int viewState, @NonNull android.view.View view) {
+                processStateInflated(viewState, view);
                 if (mStateListener != null) {
                     mStateListener.onStateInflated(viewState, view);
                 }
-                processStateInflated(viewState, view);
             }
         });
     }

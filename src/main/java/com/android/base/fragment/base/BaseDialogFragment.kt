@@ -18,7 +18,6 @@ import com.android.base.delegate.fragment.FragmentDelegateOwner
 import com.android.base.delegate.helper.FragmentDelegates
 import com.android.base.fragment.tool.dismissDialog
 import com.android.base.fragment.ui.LoadingViewHost
-import com.android.base.fragment.ui.Message
 import com.android.base.fragment.ui.internalLoadingViewHostFactory
 import timber.log.Timber
 
@@ -231,10 +230,6 @@ open class BaseDialogFragment : AppCompatDialogFragment(), OnBackPressListener, 
 
     override fun showMessage(@StringRes messageId: Int) {
         loadingView().showMessage(messageId)
-    }
-
-    override fun showMessage(message: Message) {
-        loadingView().showMessage(message)
     }
 
 }

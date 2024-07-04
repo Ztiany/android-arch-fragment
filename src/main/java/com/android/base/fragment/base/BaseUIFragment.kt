@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
-import com.android.base.fragment.anim.FragmentAnimatorHelper
-import com.android.base.fragment.tool.FragmentConfig
+import com.android.base.fragment.anim.FragmentTransitionHelper
+import com.android.base.fragment.anim.TransitionEndAction
 import com.android.base.fragment.tool.ReusableView
 import com.android.base.viewbinding.inflateBindingWithParameterizedType
 
@@ -17,9 +17,11 @@ import com.android.base.viewbinding.inflateBindingWithParameterizedType
  */
 abstract class BaseUIFragment<VB : ViewBinding> : BaseFragment() {
 
-    private var fragmentAnimatorHelper: FragmentAnimatorHelper? = null
+    protected val fragmentTransitionHelper = FragmentTransitionHelper().also {
+        addDelegate(it)
+    }
 
-    private val reuseView by lazy { ReusableView() }
+    private val reuseView by lazy(LazyThreadSafetyMode.NONE) { ReusableView() }
 
     private var _vb: VB? = null
     protected val vb: VB
@@ -64,6 +66,14 @@ abstract class BaseUIFragment<VB : ViewBinding> : BaseFragment() {
     protected open fun onViewPrepared(view: View, savedInstanceState: Bundle?) {}
 
     /**
+     * If you do heavy work in [onSetUpCreatedView] or [onViewPrepared], you can use this method to delay the execution of the code,
+     * or the heavy work during enter transition may cause the UI to freeze.
+     */
+    protected fun invokeOnEnterTransitionEnd(action: TransitionEndAction) {
+        fragmentTransitionHelper.invokeWhenEnterTransitionEnd(action)
+    }
+
+    /**
      * Call it before [onCreateView] is called.
      */
     protected fun setReuseView(reuseTheView: Boolean) {
@@ -83,10 +93,7 @@ abstract class BaseUIFragment<VB : ViewBinding> : BaseFragment() {
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        if (fragmentAnimatorHelper == null) {
-            fragmentAnimatorHelper = FragmentAnimatorHelper(requireContext(), FragmentConfig.defaultFragmentAnimator())
-        }
-        return fragmentAnimatorHelper?.onCreateAnimation(transit, enter)
+        return fragmentTransitionHelper.onCreateAnimation(view, transit, enter)
     }
 
     fun withVB(block: VB.() -> Unit) {

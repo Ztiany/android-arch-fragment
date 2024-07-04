@@ -1,5 +1,10 @@
 package com.android.base.fragment.tool
 
+import android.R
+import android.app.Activity
+import android.content.res.TypedArray
+import android.graphics.drawable.Drawable
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.android.base.fragment.ui.LoadingViewHost
@@ -38,4 +43,13 @@ internal fun <T> T.dismissDialog(
             onDismiss?.invoke()
         }
     }
+}
+
+internal fun Activity.getWindowBackground(): Drawable? {
+    val a: TypedArray = getTheme().obtainStyledAttributes(
+        intArrayOf(R.attr.windowBackground)
+    )
+    val background = a.getResourceId(0, 0)
+    a.recycle()
+    return ResourcesCompat.getDrawable(resources, background, theme)
 }

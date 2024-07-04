@@ -2,8 +2,8 @@ package com.android.base.fragment.tool;
 
 import androidx.annotation.NonNull;
 
-import com.android.base.fragment.anim.FragmentAnimator;
-import com.android.base.fragment.anim.FragmentScaleAnimator;
+import com.android.base.fragment.anim.FragmentTransitions;
+import com.android.base.fragment.anim.ScaleTransitions;
 
 /**
  * @author Ztiany
@@ -12,7 +12,7 @@ public class FragmentConfig {
 
     private static final int INVALIDATE_ID = -1;
     private static int sDefaultContainerId = INVALIDATE_ID;
-    private static FragmentAnimator sFragmentAnimator = new FragmentScaleAnimator();
+    private static FragmentTransitions sFragmentTransitions = new ScaleTransitions();
 
     public static void setDefaultContainerId(int defaultContainerId) {
         sDefaultContainerId = defaultContainerId;
@@ -25,17 +25,17 @@ public class FragmentConfig {
         return sDefaultContainerId;
     }
 
-    public static void setDefaultFragmentAnimator(@NonNull FragmentAnimator animator) {
+    public static void setDefaultFragmentTransitions(@NonNull FragmentTransitions fragmentTransitions) {
         //noinspection ConstantConditions
-        if (animator == null) {
-            throw new NullPointerException("animator can not be null.");
+        if (fragmentTransitions == null) {
+            throw new NullPointerException("fragmentTransitions can not be null.");
         }
-        sFragmentAnimator = animator;
+        sFragmentTransitions = fragmentTransitions;
     }
 
     @NonNull
-    public static FragmentAnimator defaultFragmentAnimator() {
-        return sFragmentAnimator;
+    public static FragmentTransitions defaultFragmentTransitions() {
+        return sFragmentTransitions;
     }
 
 }

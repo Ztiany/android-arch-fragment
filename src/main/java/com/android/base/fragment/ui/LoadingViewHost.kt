@@ -1,9 +1,8 @@
 package com.android.base.fragment.ui
 
 import android.app.Dialog
+import android.content.Context
 import androidx.annotation.StringRes
-
-interface Message
 
 /**
  *  A host interface for displaying loading dialog and messages.
@@ -11,8 +10,6 @@ interface Message
  * @author Ztiany
  */
 interface LoadingViewHost {
-
-    /* TODO: refactor these showLoadingDialog methods, combine them into one by using a parameter with receiver. */
 
     /** Display a loading dialog with a default message. */
     fun showLoadingDialog(): Dialog
@@ -32,12 +29,12 @@ interface LoadingViewHost {
 
     fun isLoadingDialogShowing(): Boolean
 
-    /* TODO: refactor these showMessage methods, combine them into one by using a Message object as parameter. */
-
     fun showMessage(message: CharSequence)
 
     fun showMessage(@StringRes messageId: Int)
 
-    fun showMessage(message: Message)
-
 }
+
+typealias LoadingViewHostFactory = (context: Context) -> LoadingViewHost
+
+internal var internalLoadingViewHostFactory: LoadingViewHostFactory? = null

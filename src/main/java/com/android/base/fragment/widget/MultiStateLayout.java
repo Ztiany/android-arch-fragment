@@ -356,23 +356,6 @@ public class MultiStateLayout extends FrameLayout {
         mListener = listener;
     }
 
-    public interface StateListener {
-        /**
-         * Callback for when the {@link ViewState} has changed
-         *
-         * @param viewState The {@link ViewState} that was switched to
-         */
-        void onStateChanged(@ViewState int viewState);
-
-        /**
-         * Callback for when a {@link ViewState} has been inflated
-         *
-         * @param viewState The {@link ViewState} that was inflated
-         * @param view      The {@link View} that was inflated
-         */
-        void onStateInflated(@ViewState int viewState, @NonNull View view);
-    }
-
     private static class ViewHolder {
         private View mView;
         private final int mViewLayoutId;

@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 
+import com.android.base.fragment.widget.StateListener;
 import com.android.base.fragment.widget.StateProcessor;
 
 import java.lang.annotation.Retention;
@@ -62,6 +63,6 @@ public interface StateLayoutConfig {
 
     StateLayoutConfig disableOperationWhenRequesting(boolean disable);
 
-    StateProcessor getProcessor();
+    void setStateLayoutListener(StateListener stateListener);
 
 }

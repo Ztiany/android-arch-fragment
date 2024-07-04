@@ -2,7 +2,7 @@ package com.android.base.fragment
 
 import com.android.base.core.AndroidSword
 import com.android.base.core.AndroidSword.touchMe
-import com.android.base.fragment.anim.FragmentAnimator
+import com.android.base.fragment.anim.FragmentTransitions
 import com.android.base.fragment.list.epoxy.EpoxyLoadMoreViewFactory
 import com.android.base.fragment.list.epoxy.internalDefaultEpoxyLoadMoreViewFactory
 import com.android.base.fragment.list.paging3.PagingLoadMoreViewFactory
@@ -46,12 +46,12 @@ class FragmentModuleConfig internal constructor() {
         }
 
     /**设置默认的 Fragment 转场动画 */
-    var defaultFragmentAnimator: FragmentAnimator
+    var defaultFragmentTransitions: FragmentTransitions
         set(value) {
-            FragmentConfig.setDefaultFragmentAnimator(value)
+            FragmentConfig.setDefaultFragmentTransitions(value)
         }
         get() {
-            return FragmentConfig.defaultFragmentAnimator()
+            return FragmentConfig.defaultFragmentTransitions()
         }
 
     var refreshViewFactory: RefreshViewFactory.Factory?

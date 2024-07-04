@@ -26,7 +26,7 @@ import com.android.base.fragment.ui.StateLayoutConfig;
 /**
  * @author Ztiany
  */
-public class StateActionProcessor extends StateProcessor {
+class StateActionProcessor extends StateProcessor {
 
     private OnRetryActionListener mOnRetryActionListener;
 
@@ -191,8 +191,8 @@ public class StateActionProcessor extends StateProcessor {
         }
 
         @Override
-        public StateProcessor getProcessor() {
-            return StateActionProcessor.this;
+        public void setStateLayoutListener(StateListener stateListener) {
+            mSimpleMultiStateLayout.setStateListener(stateListener);
         }
 
     };
