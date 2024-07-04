@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface ListState<T, LS : ListState<T, LS>> {
 
@@ -91,12 +92,13 @@ fun <T> ListLayoutHost<T>.handleListState(
         data.map { it.data }
             .distinctUntilChanged()
             .collect {
+                Timber.d(it.toString())
                 submitData(it)
             }
     }
     // handling refresh state
     launch {
-        data.map { Pair(it.isRefreshing, it.refreshError) }
+        data.map { Triple(it.isRefreshing, it.refreshError, it.data.isEmpty()) }
             .distinctUntilChanged()
             .collect {
                 handleRefreshState(it, listHandler)
@@ -113,7 +115,7 @@ fun <T> ListLayoutHost<T>.handleListState(
 }
 
 private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
-    refreshState: Pair<Boolean/*is refreshing*/, Throwable?>,
+    refreshState: Triple<Boolean/*is refreshing*/, Throwable?, Boolean/* is empty*/>,
     listStateHandler: ListStateHandlerBuilder,
 ) {
     // refreshing
@@ -160,7 +162,7 @@ private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
     }
 
     // finished with no error
-    if (isEmpty() && !isRefreshing()) {
+    if (refreshState.third /* isEmpty */ && !isRefreshing()) {
         // default handling process
         val defaultHandling = { showEmptyLayout() }
         // your custom handling process
