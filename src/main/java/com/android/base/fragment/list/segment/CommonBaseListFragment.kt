@@ -14,11 +14,11 @@ abstract class CommonBaseListFragment<T, VB : ViewBinding> : BaseListFragment<T,
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should call [setUpCommonList] to return a real [SegmentedListLayoutHost].
+     *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
 
-    protected fun setUpCommonList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
+    protected fun setUpList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
         return setUpList(listDataHost, AutoPaging())
     }
 
@@ -31,11 +31,11 @@ abstract class CommonBaseListDialogFragment<T, VB : ViewBinding> : BaseListDialo
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should call [setUpCommonList] to return a real [SegmentedListLayoutHost].
+     *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
 
-    protected fun setUpCommonList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
+    protected fun setUpList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
         return setUpList(listDataHost, AutoPaging())
     }
 
@@ -48,11 +48,11 @@ abstract class CommonBaseList2Fragment<T, VB : ViewBinding> : BaseList2Fragment<
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should call [setUpCommonList] to return a real [SegmentedListLayoutHost].
+     *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
 
-    protected fun setUpCommonList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
+    protected fun setUpList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
         return setUpList(listDataHost, AutoPaging())
     }
 
@@ -65,11 +65,11 @@ abstract class CommonBaseList2DialogFragment<T, VB : ViewBinding> : BaseList2Dia
 
     /**
      *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
-     *  2. You should call [setUpCommonList] to return a real [SegmentedListLayoutHost].
+     *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
 
-    protected fun setUpCommonList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
+    protected fun setUpList(listDataHost: SegmentedListDataHost<T>): SegmentedListLayoutHost<T, Int> {
         return setUpList(listDataHost, AutoPaging())
     }
 
