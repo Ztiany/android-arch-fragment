@@ -120,7 +120,7 @@ private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
 ) {
     // refreshing
     if (refreshState.first) {
-        if (isEmpty() && listStateHandler.showContentLoadingWhenEmpty && !isRefreshing()) {
+        if (refreshState.third /* isEmpty */ && listStateHandler.showContentLoadingWhenEmpty && !isRefreshing()) {
             showLoadingLayout()
         } else {
             setRefreshing()
@@ -134,7 +134,7 @@ private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
     if (refreshError != null) {
         // default handling process
         val defaultHandling = {
-            if (isEmpty()) {
+            if (refreshState.third /* isEmpty */) {
                 val errorTypeClassifier = AndroidSword.errorClassifier
                 if (errorTypeClassifier != null) {
                     when {
@@ -151,7 +151,7 @@ private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
         }
         // your custom handling process
         listStateHandler.onRefreshError?.also {
-            HandlingProcedure(defaultHandling).it(isEmpty(), refreshError)
+            HandlingProcedure(defaultHandling).it(refreshState.third /* isEmpty */, refreshError)
         } ?: defaultHandling()
         return
     }
