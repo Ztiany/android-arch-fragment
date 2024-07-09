@@ -70,7 +70,7 @@ abstract class BaseUIFragment<VB : ViewBinding> : BaseFragment() {
      * or the heavy work during enter transition may cause the UI to freeze.
      */
     protected fun invokeOnEnterTransitionEnd(action: TransitionEndAction) {
-        fragmentTransitionHelper.invokeWhenEnterTransitionEnd(action)
+        fragmentTransitionHelper.invokeOnEnterTransitionEnd(action)
     }
 
     /**

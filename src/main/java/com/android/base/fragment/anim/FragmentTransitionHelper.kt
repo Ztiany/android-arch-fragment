@@ -220,7 +220,7 @@ class FragmentTransitionHelper : FragmentDelegate<Fragment> {
         }
     }
 
-    fun invokeWhenEnterTransitionEnd(action: TransitionEndAction) {
+    fun invokeOnEnterTransitionEnd(action: TransitionEndAction) {
         if (enterTransitionEnded || !isFirstEnter) {
             action()
             return
