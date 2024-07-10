@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
+import com.android.base.fragment.anim.FragmentTransitionHelper
+import com.android.base.fragment.anim.TransitionEndAction
 import com.android.base.fragment.tool.ReusableView
 import com.android.base.viewbinding.inflateBindingWithParameterizedType
 
@@ -15,7 +18,11 @@ import com.android.base.viewbinding.inflateBindingWithParameterizedType
  */
 abstract class BaseUIDialogFragment<VB : ViewBinding> : BaseDialogFragment() {
 
-    private val reuseView by lazy { ReusableView() }
+    protected val fragmentTransitionHelper = FragmentTransitionHelper().also {
+        addDelegate(it)
+    }
+
+    private val reuseView by lazy(LazyThreadSafetyMode.NONE) { ReusableView() }
 
     private var _vb: VB? = null
     protected val vb: VB
@@ -60,6 +67,14 @@ abstract class BaseUIDialogFragment<VB : ViewBinding> : BaseDialogFragment() {
     protected open fun onViewPrepared(view: View, savedInstanceState: Bundle?) {}
 
     /**
+     * If you do heavy work in [onSetUpCreatedView] or [onViewPrepared], you can use this method to delay the execution of the code,
+     * or the heavy work during enter transition may cause the UI to freeze.
+     */
+    protected fun invokeOnEnterTransitionEnd(action: TransitionEndAction) {
+        fragmentTransitionHelper.invokeOnEnterTransitionEnd(action)
+    }
+
+    /**
      * Call it before [onCreateView] is called.
      */
     protected fun setReuseView(reuseTheView: Boolean) {
@@ -76,6 +91,10 @@ abstract class BaseUIDialogFragment<VB : ViewBinding> : BaseDialogFragment() {
     override fun onDestroy() {
         super.onDestroy()
         _vb = null
+    }
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        return fragmentTransitionHelper.onCreateAnimation(view, transit, enter)
     }
 
     fun withVB(block: VB.() -> Unit) {

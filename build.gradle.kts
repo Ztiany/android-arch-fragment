@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-    //  基础库
+    //  base
     api(libs.base.arch.core)
     api(libs.base.arch.activity)
     api(libs.base.arch.adapter)
