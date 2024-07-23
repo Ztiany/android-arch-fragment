@@ -1,5 +1,6 @@
 package com.android.base.fragment.base
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -7,11 +8,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
+import com.android.base.activity.BaseActivity
 import com.android.base.activity.OnBackPressListener
-import com.android.base.activity.fragmentHandleBackPress
+import com.android.base.activity.disable
+import com.android.base.activity.enable
+import com.android.base.activity.fragmentHandleBackPressed
 import com.android.base.delegate.State
 import com.android.base.delegate.fragment.FragmentDelegate
 import com.android.base.delegate.fragment.FragmentDelegateOwner
@@ -32,7 +37,17 @@ open class BaseFragment : Fragment(), OnBackPressListener, FragmentDelegateOwner
 
     private var loadingViewHost: LoadingViewHost? = null
 
-    private val fragmentDelegates by lazy { FragmentDelegates(this) }
+    private val fragmentDelegates by lazy(LazyThreadSafetyMode.NONE) { FragmentDelegates(this) }
+
+    private val backPressedCallback by lazy(LazyThreadSafetyMode.NONE) {
+        object : OnBackPressedCallback(false) {
+            init {
+                activity?.onBackPressedDispatcher?.addCallback(this)
+            }
+
+            override fun handleOnBackPressed() = this@BaseFragment.handleOnBackPressed()
+        }
+    }
 
     private fun tag() = this.javaClass.simpleName
 
@@ -172,15 +187,24 @@ open class BaseFragment : Fragment(), OnBackPressListener, FragmentDelegateOwner
     }
 
     final override fun onBackPressed(): Boolean {
-        return handleBackPress() || fragmentHandleBackPress(this)
+        return handleBackPressed() || fragmentHandleBackPressed()
     }
 
     /**
-     * Fragment 需要自己处理 BackPress 事件，如果不处理，就交给子 Fragment 处理，都不处理则由 Activity 处理。
+     * This is the traditional way to handle back press event. This method only works when its host
+     * [Activity] is [BaseActivity] and the [BaseActivity] has enabled the traditional back press handling.
+     * To enable the traditional back press handling, you need to call [BaseActivity.enableTraditionalBackPressHandling].
+     *
+     * return true if you have handled the back press event and prevent the default behavior.
      */
-    protected open fun handleBackPress(): Boolean {
-        return false
-    }
+    protected open fun handleBackPressed() = false
+
+    /**
+     * If you want to handle back press event, you can override this method. But to make it work,
+     * you need to call [enable] on the [backPressedCallback] to enable it. Once the back conditions are met,
+     * you need to call [disable] on the [backPressedCallback] to disable it.
+     */
+    protected open fun handleOnBackPressed() = Unit
 
     private fun loadingView(): LoadingViewHost {
         val loadingViewImpl = loadingViewHost
