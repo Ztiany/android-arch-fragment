@@ -137,9 +137,9 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
         showLoading = false
     }
 
-    /** indicate whether the loading dialog is cancelable. */
-    fun forceLoading() {
-        this.forceLoading = true
+    /** indicate whether the loading dialog is cancelable. false in default. */
+    fun forceLoading(force: Boolean) {
+        this.forceLoading = force
     }
 
     /** indicate that the error message just displays once. */
