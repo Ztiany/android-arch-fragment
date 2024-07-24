@@ -22,8 +22,12 @@ import com.android.base.foundation.state.onNoData
 import com.android.base.foundation.state.onSuccess
 import com.android.base.fragment.tool.HandlingProcedure
 import com.android.base.fragment.tool.collectFlowRepeatedlyOnViewLifecycle
+import com.android.base.fragment.tool.runRepeatedlyOnViewLifecycle
 import com.android.base.fragment.ui.LoadingViewHost
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import androidx.lifecycle.observe as observeDeprecated
 
 private fun <T> LifecycleOwner.dummyKeep(liveData: LiveData<T>) {
@@ -56,7 +60,6 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     internal var loadingMessage: CharSequence = ""
     internal var showLoading: Boolean = true
     internal var forceLoading: Boolean = true
-    internal var handlerErrorAsEvent: Boolean = false
 
     /** [onLoadingWithStep] will be called once state is [Loading]. */
     fun onLoadingWithStep(onLoading: HandlingProcedure.(step: L?) -> Unit) {
@@ -142,11 +145,6 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
         this.forceLoading = force
     }
 
-    /** indicate that the error message just displays once. */
-    fun handlerErrorAsEvent() {
-        handlerErrorAsEvent = true
-    }
-
 }
 
 /**
@@ -186,12 +184,9 @@ fun <H, L, D, E> H.handleFlowWithLifecycle(
     data: Flow<State<L, D, E>>,
     handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val builder = StateHandlerBuilder<L, D, E>().apply {
-        handlerBuilder()
-    }
-
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply(handlerBuilder)
     collectFlowRepeatedlyOnLifecycle(activeState, data = data) {
-        handleStateInternal(it, builder)
+        handleStateInternal(it, stateHandler)
     }
 }
 
@@ -204,11 +199,23 @@ fun <H, L, D, E> H.handleFlowWithViewLifecycle(
     data: Flow<State<L, D, E>>,
     handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : Fragment {
-    val stateHandler = StateHandlerBuilder<L, D, E>().apply {
-        handlerBuilder()
-    }
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply(handlerBuilder)
     collectFlowRepeatedlyOnViewLifecycle(activeState, data = data) {
         handleStateInternal(it, stateHandler)
+    }
+}
+
+/** refers to [handleFlowWithViewLifecycle] for details. It's for handing flow data in the [runRepeatedlyOnViewLifecycle]. */
+context(CoroutineScope)
+fun <H, L, D, E> H.handleFlow(
+    data: Flow<State<L, D, E>>,
+    handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
+) where H : LoadingViewHost, H : LifecycleOwner {
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply(handlerBuilder)
+    launch {
+        data.collectLatest {
+            handleStateInternal(it, stateHandler)
+        }
     }
 }
 
@@ -217,9 +224,7 @@ fun <H, L, D, E> H.handleState(
     state: State<L, D, E>,
     handlerBuilder: StateHandlerBuilder<L, D, E>.() -> Unit,
 ) where H : LoadingViewHost, H : LifecycleOwner {
-    val stateHandler = StateHandlerBuilder<L, D, E>().apply {
-        handlerBuilder()
-    }
+    val stateHandler = StateHandlerBuilder<L, D, E>().apply(handlerBuilder)
     handleStateInternal(state, stateHandler)
 }
 
@@ -263,10 +268,8 @@ private fun <H, L, D, E> H.handleStateInternal(
                         stateHandler.onError?.invoke(procedure, state.error, state.reason)
                     }
                     stateHandler.onErrorState?.invoke(procedure, state.error, state.reason)
-                } else {
-                    if (!state.isHandled || (state.isHandled && !stateHandler.handlerErrorAsEvent)) {
-                        showMessage(AndroidSword.errorConvert.convert(state.error))
-                    }
+                } else if (!state.isHandled) {
+                    showMessage(AndroidSword.errorConvert.convert(state.error))
                 }
 
                 state.markAsHandled()
