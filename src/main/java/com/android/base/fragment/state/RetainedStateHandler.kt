@@ -7,8 +7,7 @@ import com.android.base.fragment.ui.StateLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 interface DataState<T> {
@@ -121,9 +120,9 @@ fun <D> StateLayoutHost.handleFlowDataState(
     handler: DataStateHandlerBuilder<D>.() -> Unit,
 ) {
     launch {
-        flowData.onEach {
+        flowData.collectLatest {
             handleDataState(it, handler)
-        }.collect()
+        }
     }
 }
 

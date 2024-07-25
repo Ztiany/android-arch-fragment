@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -25,9 +26,9 @@ fun <T> Fragment.collectFlowRepeatedlyOnViewLifecycle(
     onResult: suspend (result: T) -> Unit,
 ) {
     runRepeatedlyOnViewLifecycle(activeState) {
-        data.onEach {
+        data.collectLatest {
             onResult(it)
-        }.launchIn(this)
+        }
     }
 }
 

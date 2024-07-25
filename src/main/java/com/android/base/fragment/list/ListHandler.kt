@@ -7,6 +7,7 @@ import com.android.base.fragment.ui.ListLayoutHost
 import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -91,7 +92,7 @@ fun <T> ListLayoutHost<T>.handleListState(
     launch {
         data.map { it.data }
             .distinctUntilChanged()
-            .collect {
+            .collectLatest {
                 Timber.d(it.toString())
                 submitData(it)
             }
@@ -100,7 +101,7 @@ fun <T> ListLayoutHost<T>.handleListState(
     launch {
         data.map { Triple(it.isRefreshing, it.refreshError, it.data.isEmpty()) }
             .distinctUntilChanged()
-            .collect {
+            .collectLatest {
                 handleRefreshState(it, listHandler)
             }
     }
@@ -108,7 +109,7 @@ fun <T> ListLayoutHost<T>.handleListState(
     launch {
         data.map { Triple(it.isLoadingMore, it.hasMore, it.loadMoreError) }
             .distinctUntilChanged()
-            .collect {
+            .collectLatest {
                 handleLoadingMoreState(it, listHandler)
             }
     }
