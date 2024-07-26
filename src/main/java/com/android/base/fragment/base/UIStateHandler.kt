@@ -117,17 +117,17 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
 
     /** [onSuccessState] will always be called once [State] is [Success]. */
     fun onSuccessState(onSuccessState: (D?) -> Unit) {
-        this.onSuccess = onSuccessState
+        this.onSuccessState = onSuccessState
     }
 
     /** [onDataState] will be called only when [State] is [Data]. */
     fun onDataState(onDataState: (D) -> Unit) {
-        this.onData = onDataState
+        this.onDataState = onDataState
     }
 
     /** [onDataState] will be called only when [State] is [NoData]. */
     fun onNoDataState(onNoDataState: () -> Unit) {
-        this.onNoData = onNoDataState
+        this.onNoDataState = onNoDataState
     }
 
     /** when [State] is [Loading], what to show on the loading dialog. */
