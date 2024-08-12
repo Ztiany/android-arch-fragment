@@ -19,10 +19,8 @@ dependencies {
     api(libs.base.arch.activity)
     api(libs.base.arch.adapter)
     api(libs.base.arch.viewbinding)
-
     api(libs.ztiany.archdelegate)
     api(libs.ztiany.uistate)
-
     // androidx
     api(libs.androidx.annotations)
     api(libs.androidx.activity.ktx)
@@ -34,17 +32,14 @@ dependencies {
     api(libs.google.ui.material)
     api(libs.androidx.viewpager2)
     compileOnly(libs.androidx.paging.runtime)
-
     // kotlin
     api(libs.kotlin.stdlib)
     api(libs.kotlin.reflect)
     api(libs.kotlinx.coroutines)
     api(libs.kotlinx.coroutines.android)
-
-    // log
-    api(libs.jakewharton.timber)
-
     // epoxy
     api(libs.airbnb.epoxy.core)
     ksp(libs.airbnb.epoxy.processor)
+    // log
+    implementation(libs.jakewharton.timber)
 }
