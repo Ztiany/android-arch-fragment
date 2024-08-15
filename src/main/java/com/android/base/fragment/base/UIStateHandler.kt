@@ -67,7 +67,7 @@ class StateHandlerBuilder<L, D, E> internal constructor() {
     }
 
     /** [onLoading] will be called once state is [Loading]. */
-    fun onLoading(onLoading: () -> Unit) {
+    fun onLoading(onLoading: HandlingProcedure.() -> Unit) {
         onLoadingWithStep {
             onLoading()
         }

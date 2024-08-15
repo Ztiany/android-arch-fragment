@@ -38,7 +38,7 @@ open class BaseDialogFragment : AppCompatDialogFragment(), OnBackPressListener, 
 
     private val fragmentDelegates by lazy(LazyThreadSafetyMode.NONE) { FragmentDelegates(this) }
 
-    private val backPressedCallback by lazy(LazyThreadSafetyMode.NONE) {
+    protected val backPressedCallback by lazy(LazyThreadSafetyMode.NONE) {
         object : OnBackPressedCallback(false) {
             init {
                 activity?.onBackPressedDispatcher?.addCallback(this)
