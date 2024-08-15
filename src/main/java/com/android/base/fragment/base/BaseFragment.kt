@@ -42,7 +42,7 @@ open class BaseFragment : Fragment(), OnBackPressListener, FragmentDelegateOwner
     protected val backPressedCallback by lazy(LazyThreadSafetyMode.NONE) {
         object : OnBackPressedCallback(false) {
             init {
-                activity?.onBackPressedDispatcher?.addCallback(this)
+                activity?.onBackPressedDispatcher?.addCallback(this@BaseFragment, this)
             }
 
             override fun handleOnBackPressed() = this@BaseFragment.handleOnBackPressed()
