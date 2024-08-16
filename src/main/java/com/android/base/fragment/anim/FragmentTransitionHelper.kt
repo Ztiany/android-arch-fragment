@@ -35,7 +35,11 @@ class FragmentTransitionHelper : FragmentDelegate<Fragment> {
     private var animationDisabled = false
 
     private var originalBackground: Drawable? = null
+
     private var originalElevation = 0F
+
+    private var onCreateAnimationIsCalled = false
+    private var enterTransitionEndNotified = false
 
     override fun onAttachToFragment(fragment: Fragment) {
         host = fragment
@@ -62,7 +66,25 @@ class FragmentTransitionHelper : FragmentDelegate<Fragment> {
         originalElevation = view.elevation
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enterTransitionEnded = savedInstanceState?.getBoolean(KEY_FOR_TRANSITION_STATE) ?: false
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        savedInstanceState.putBoolean(KEY_FOR_TRANSITION_STATE, enterTransitionEnded)
+        super.onSaveInstanceState(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // for those fragments that don't have any animation or are added as a root fragment.
+        if (!onCreateAnimationIsCalled) {
+            notifyFragmentEnterTransitionEnded()
+        }
+    }
+
     fun onCreateAnimation(targetView: View?, transit: Int, enter: Boolean): Animation? {
+        onCreateAnimationIsCalled = true
         targetView ?: return null
 
         if (animationDisabled) {
@@ -210,6 +232,11 @@ class FragmentTransitionHelper : FragmentDelegate<Fragment> {
     }
 
     private fun notifyFragmentEnterTransitionEnded() {
+        if (enterTransitionEndNotified) {
+            return
+        }
+
+        enterTransitionEndNotified = true
         enterTransitionEnded = true
 
         with(enterTransitionEndActions.listIterator()) {
@@ -226,6 +253,10 @@ class FragmentTransitionHelper : FragmentDelegate<Fragment> {
             return
         }
         enterTransitionEndActions.add(action)
+    }
+
+    companion object {
+        private const val KEY_FOR_TRANSITION_STATE = "enterTransitionEnded"
     }
 
 }
