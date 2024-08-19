@@ -47,27 +47,27 @@ abstract class BaseUIDialogFragment<VB : ViewBinding> : BaseDialogFragment() {
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (reuseView.isNotTheSameView(view)) {
-            internalOnSetUpCreatedView(view, savedInstanceState)
-            onSetUpCreatedView(view, savedInstanceState)
+            internalOnSetupCreatedView(view, savedInstanceState)
+            onSetupCreatedView(view, savedInstanceState)
         }
         super.onViewCreated(view, savedInstanceState)
         onViewPrepared(view, savedInstanceState)
     }
 
-    internal open fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {}
+    internal open fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {}
 
     /**
      * Called when the view is prepared. If [setReuseView] is called and passes true as the parameter, it will be called just once.
      *
      * @param view view of fragment.
      */
-    protected open fun onSetUpCreatedView(view: View, savedInstanceState: Bundle?) {}
+    protected open fun onSetupCreatedView(view: View, savedInstanceState: Bundle?) {}
 
-    /** Called when after [onSetUpCreatedView] is called. */
+    /** Called when after [onSetupCreatedView] is called. */
     protected open fun onViewPrepared(view: View, savedInstanceState: Bundle?) {}
 
     /**
-     * If you do heavy work in [onSetUpCreatedView] or [onViewPrepared], you can use this method to delay the execution of the code,
+     * If you do heavy work in [onSetupCreatedView] or [onViewPrepared], you can use this method to delay the execution of the code,
      * or the heavy work during enter transition may cause the UI to freeze.
      */
     protected fun invokeOnEnterTransitionEnd(action: TransitionEndAction) {

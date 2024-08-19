@@ -20,12 +20,12 @@ abstract class BaseList2DialogFragment<T, PageKey : Any, VB : ViewBinding> : Bas
 
     private var listLayoutHostImpl: SegmentedListLayoutHost<T, PageKey> by Delegates.notNull()
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
     }
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [ListLayoutHost].
      */
     abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, PageKey>
@@ -69,7 +69,7 @@ abstract class BaseList2DialogFragment<T, PageKey : Any, VB : ViewBinding> : Bas
     val paging: Paging<PageKey>
         get() = listLayoutHostImpl.paging
 
-    protected val listLayoutController: SegmentedListLayoutHost<T, PageKey>
+    protected val listController: SegmentedListLayoutHost<T, PageKey>
         get() = listLayoutHostImpl
 
 }

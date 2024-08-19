@@ -10,7 +10,7 @@ class AutoPaging(
     override val start: Int = defaultPagingStart,
 ) : Paging<Int>() {
 
-    private var accumulatedPage = AtomicInteger(size)
+    private var accumulatedPage = AtomicInteger(start)
 
     val current: Int
         get() = accumulatedPage.get()

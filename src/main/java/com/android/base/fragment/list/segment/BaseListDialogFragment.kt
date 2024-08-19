@@ -29,12 +29,12 @@ abstract class BaseListDialogFragment<T, PageKey : Any, VB : ViewBinding> : Base
 
     private var listLayoutHostImpl: SegmentedListLayoutHost<T, PageKey> by Delegates.notNull()
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
     }
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, PageKey>
@@ -93,7 +93,7 @@ abstract class BaseListDialogFragment<T, PageKey : Any, VB : ViewBinding> : Base
     protected val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")
 
-    protected val listLayoutController: SegmentedListLayoutHost<T, PageKey>
+    protected val listController: SegmentedListLayoutHost<T, PageKey>
         get() = listLayoutHostImpl
 
     protected val paging: Paging<PageKey>

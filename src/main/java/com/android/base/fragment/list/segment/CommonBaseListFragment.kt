@@ -13,7 +13,7 @@ import com.android.base.fragment.ui.SegmentedListLayoutHost
 abstract class CommonBaseListFragment<T, VB : ViewBinding> : BaseListFragment<T, Int, VB>() {
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
@@ -30,7 +30,7 @@ abstract class CommonBaseListFragment<T, VB : ViewBinding> : BaseListFragment<T,
 abstract class CommonBaseListDialogFragment<T, VB : ViewBinding> : BaseListDialogFragment<T, Int, VB>() {
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
@@ -47,7 +47,7 @@ abstract class CommonBaseListDialogFragment<T, VB : ViewBinding> : BaseListDialo
 abstract class CommonBaseList2Fragment<T, VB : ViewBinding> : BaseList2Fragment<T, Int, VB>() {
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>
@@ -64,7 +64,7 @@ abstract class CommonBaseList2Fragment<T, VB : ViewBinding> : BaseList2Fragment<
 abstract class CommonBaseList2DialogFragment<T, VB : ViewBinding> : BaseList2DialogFragment<T, Int, VB>() {
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [SegmentedListLayoutHost].
      */
     abstract override fun provideListImplementation(view: View, savedInstanceState: Bundle?): SegmentedListLayoutHost<T, Int>

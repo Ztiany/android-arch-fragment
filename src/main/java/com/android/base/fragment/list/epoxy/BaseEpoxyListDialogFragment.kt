@@ -21,12 +21,12 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
 
     private var listLayoutHostImpl: ListLayoutHost<T> by Delegates.notNull()
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         listLayoutHostImpl = provideListImplementation(view, savedInstanceState)
     }
 
     /**
-     *  1. This method will be called before [onViewCreated] and [onSetUpCreatedView].
+     *  1. This method will be called before [onViewCreated] and [onSetupCreatedView].
      *  2. You should call [setUpList] to return a real [ListLayoutHost].
      */
     abstract fun provideListImplementation(view: View, savedInstanceState: Bundle?): ListLayoutHost<T>
@@ -81,7 +81,7 @@ abstract class BaseEpoxyListDialogFragment<T, VB : ViewBinding> : BaseUIDialogFr
     val loadMoreController: LoadMoreController
         get() = loadMoreImpl ?: throw NullPointerException("You didn't enable load-more.")
 
-    val listLayoutController: ListLayoutHost<T>
+    val listController: ListLayoutHost<T>
         get() = listLayoutHostImpl
 
 }

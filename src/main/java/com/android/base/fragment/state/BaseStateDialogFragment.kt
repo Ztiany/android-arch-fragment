@@ -17,7 +17,7 @@ abstract class BaseStateDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<
 
     private lateinit var stateLayoutHostImpl: StateLayoutHost
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         stateLayoutHostImpl = buildStateLayoutHost(
             view.findViewById(CommonId.STATE_ID),
             view.findViewById(CommonId.REFRESH_ID)
@@ -48,7 +48,7 @@ abstract class BaseStateDialogFragment<VB : ViewBinding> : BaseUIDialogFragment<
 
     protected open fun onRefresh() {}
 
-    val stateLayoutController: StateLayoutHost
+    val stateController: StateLayoutHost
         get() = stateLayoutHostImpl
 
 }

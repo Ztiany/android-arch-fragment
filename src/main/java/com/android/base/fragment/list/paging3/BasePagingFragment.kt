@@ -19,7 +19,7 @@ abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>() {
 
     private lateinit var pagingLayoutImpl: PagingLayoutHost
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         pagingLayoutImpl = buildStateLayoutHost(
             view.findViewById(CommonId.STATE_ID),
             view.findViewById(CommonId.REFRESH_ID)
@@ -50,7 +50,7 @@ abstract class BasePagingFragment<VB : ViewBinding> : BaseUIFragment<VB>() {
 
     protected open fun onRefresh() {}
 
-    val pagingLayoutController: PagingLayoutHost
+    val pagingController: PagingLayoutHost
         get() = pagingLayoutImpl
 
 }

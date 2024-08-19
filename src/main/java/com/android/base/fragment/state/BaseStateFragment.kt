@@ -32,7 +32,7 @@ abstract class BaseStateFragment<VB : ViewBinding> : BaseUIFragment<VB>() {
 
     private lateinit var stateLayoutHostImpl: StateLayoutHost
 
-    override fun internalOnSetUpCreatedView(view: View, savedInstanceState: Bundle?) {
+    override fun internalOnSetupCreatedView(view: View, savedInstanceState: Bundle?) {
         stateLayoutHostImpl = buildStateLayoutHost(
             view.findViewById(CommonId.STATE_ID),
             view.findViewById(CommonId.REFRESH_ID)
@@ -63,7 +63,7 @@ abstract class BaseStateFragment<VB : ViewBinding> : BaseUIFragment<VB>() {
 
     protected open fun onRefresh() {}
 
-    val stateLayoutController: StateLayoutHost
+    val stateController: StateLayoutHost
         get() = stateLayoutHostImpl
 
 }
