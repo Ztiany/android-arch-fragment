@@ -215,7 +215,7 @@ private fun StateLayoutHost.handleStateError(throwable: Throwable) {
         refreshCompleted()
     }
 
-    val errorTypeClassifier = AndroidSword.errorClassifier
+    val errorTypeClassifier = AndroidSword.requestErrorClassifier
     if (errorTypeClassifier != null) {
         when {
             errorTypeClassifier.isNetworkError(throwable) -> showNetErrorLayout()

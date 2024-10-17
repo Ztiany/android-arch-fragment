@@ -132,7 +132,7 @@ private suspend fun PagingLayoutHost.handlePagingRefreshState(
             // default handling process
             val defaultHandling = {
                 if (isEmpty) {
-                    val errorTypeClassifier = AndroidSword.errorClassifier
+                    val errorTypeClassifier = AndroidSword.requestErrorClassifier
                     if (errorTypeClassifier != null) {
                         when {
                             errorTypeClassifier.isNetworkError(refreshError) -> showNetErrorLayout()

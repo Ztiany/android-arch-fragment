@@ -136,7 +136,7 @@ private suspend fun <T> ListLayoutHost<T>.handleRefreshState(
         // default handling process
         val defaultHandling = {
             if (refreshState.third /* isEmpty */) {
-                val errorTypeClassifier = AndroidSword.errorClassifier
+                val errorTypeClassifier = AndroidSword.requestErrorClassifier
                 if (errorTypeClassifier != null) {
                     when {
                         errorTypeClassifier.isNetworkError(refreshError) -> showNetErrorLayout()

@@ -124,7 +124,7 @@ fun SegmentedListLayoutHost<*, *>.handleListError(throwable: Throwable) {
     }
 
     if (isEmpty()) {
-        val errorTypeClassifier = AndroidSword.errorClassifier
+        val errorTypeClassifier = AndroidSword.requestErrorClassifier
         if (errorTypeClassifier != null) {
             when {
                 errorTypeClassifier.isNetworkError(throwable) -> showNetErrorLayout()

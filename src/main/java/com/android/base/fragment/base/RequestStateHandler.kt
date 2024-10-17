@@ -242,14 +242,14 @@ private fun <H, L, D, E> H.handleStateInternal(
 
                 if (stateHandler.onError != null || stateHandler.onErrorState != null) {
                     val procedure = HandlingProcedure {
-                        showMessage(AndroidSword.errorConvert.convert(state.error))
+                        AndroidSword.requestErrorHandler.handle(state.error)
                     }
                     if (!state.isHandled) {
                         stateHandler.onError?.invoke(procedure, state)
                     }
                     stateHandler.onErrorState?.invoke(procedure, state)
                 } else if (!state.isHandled) {
-                    showMessage(AndroidSword.errorConvert.convert(state.error))
+                    AndroidSword.requestErrorHandler.handle(state.error)
                 }
 
                 state.markAsHandled()

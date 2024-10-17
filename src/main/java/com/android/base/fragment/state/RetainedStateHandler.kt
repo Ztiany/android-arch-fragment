@@ -185,7 +185,7 @@ suspend fun <D> StateLayoutHost.handleDataState(
         // default handling process
         val defaultHandling = {
             // refreshing failed but we don't have previously loaded data.
-            val errorTypeClassifier = AndroidSword.errorClassifier
+            val errorTypeClassifier = AndroidSword.requestErrorClassifier
             if (errorTypeClassifier != null) {
                 when {
                     errorTypeClassifier.isNetworkError(it) -> showNetErrorLayout()

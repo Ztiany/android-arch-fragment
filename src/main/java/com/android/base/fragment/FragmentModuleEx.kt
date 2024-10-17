@@ -17,6 +17,9 @@ import com.android.base.fragment.ui.internalRetryByAutoRefresh
 import com.ztiany.loadmore.adapter.LoadMode
 import com.ztiany.loadmore.adapter.LoadMoreConfig
 
+/**
+ * A class used to configure the Fragment module.
+ */
 class FragmentModuleConfig internal constructor() {
 
     var defaultPageStart: Int
@@ -27,7 +30,6 @@ class FragmentModuleConfig internal constructor() {
             return Paging.defaultPagingStart
         }
 
-    /** 列表分页大小。 */
     var defaultPageSize: Int
         set(value) {
             Paging.defaultPagingSize = value
@@ -36,7 +38,9 @@ class FragmentModuleConfig internal constructor() {
             return Paging.defaultPagingSize
         }
 
-    /** 设置一个默认的布局 id，在使用 Fragments 中相关方法时，如果没有传入特定的容器 id  时，则使用设置的默认布局 id。【必须配置】  */
+    /**
+     * Provide a default layout id for Fragments. If you don't provide a specific container id when using the related methods in Fragments, the default layout id will be used.【Must be configured】
+     */
     var defaultFragmentContainerId: Int
         set(value) {
             FragmentConfig.setDefaultContainerId(value)
@@ -45,7 +49,6 @@ class FragmentModuleConfig internal constructor() {
             return FragmentConfig.defaultContainerId()
         }
 
-    /**设置默认的 Fragment 转场动画 */
     var defaultFragmentTransitions: FragmentTransitions
         set(value) {
             FragmentConfig.setDefaultFragmentTransitions(value)
@@ -62,7 +65,9 @@ class FragmentModuleConfig internal constructor() {
             return RefreshViewFactory.getFactory()
         }
 
-    /** 加载更多的方式，默认为滑动到底部时自动加载更多。*/
+    /**
+     * The way to load more, the default is to automatically load more when sliding to the bottom.
+     */
     @LoadMode
     var loadMoreMode: Int
         get() {
@@ -80,14 +85,18 @@ class FragmentModuleConfig internal constructor() {
             return RefreshLoadMoreViewFactory.getFactory()
         }
 
-    /** 用于创建 LoadingView。【必须配置】 */
+    /**
+     * It is used to configure the loading view.【Must be configured】
+     */
     var loadingViewHostFactory: LoadingViewHostFactory?
         set(value) {
             internalLoadingViewHostFactory = value
         }
         get() = internalLoadingViewHostFactory
 
-    /** 用于配置使用 epoxy 时，LoadMore Item 的视图 。 */
+    /**
+     * Configure it if you want to use the [Epoxy](https://github.com/airbnb/epoxy).
+     */
     var epoxyLoadMoreViewFactory: EpoxyLoadMoreViewFactory
         set(value) {
             touchMe()
@@ -95,7 +104,9 @@ class FragmentModuleConfig internal constructor() {
         }
         get() = internalDefaultEpoxyLoadMoreViewFactory
 
-    /** 用于配置使用 Paging3 时，LoadMore Item 的视图 。 */
+    /**
+     * It is used to generate load more view for Paging3.
+     * */
     var pagingLoadMoreViewFactory: PagingLoadMoreViewFactory
         set(value) {
             touchMe()
