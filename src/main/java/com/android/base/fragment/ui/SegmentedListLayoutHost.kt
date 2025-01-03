@@ -16,7 +16,7 @@ interface SegmentedListDataHost<T> {
 
 interface SegmentedListLayoutHost<T, PageKey : Any> : StateLayoutHost, SegmentedListDataHost<T> {
 
-    fun loadMoreCompleted(hasMore: Boolean)
+    fun loadMoreCompleted(hasMore: Boolean, appended: Boolean)
 
     fun loadMoreFailed()
 

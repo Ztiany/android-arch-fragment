@@ -1,7 +1,7 @@
 package com.android.base.fragment.ui
 
 /**
- * 对下拉刷新/加载更多的抽象。
+ * An interface for a view that supports refresh and load more.
  *
  * @author Ztiany
  */
@@ -19,7 +19,11 @@ interface RefreshLoadMoreView {
 
     fun setLoadingMore()
 
-    fun loadMoreCompleted(hasMore: Boolean)
+    /**
+     * @param hasMore true if has more data.
+     * @param appended true if there is data appended from last load more.
+     */
+    fun loadMoreCompleted(hasMore: Boolean, appended: Boolean)
 
     fun loadMoreFailed()
 

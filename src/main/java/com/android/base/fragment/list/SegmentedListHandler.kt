@@ -11,7 +11,7 @@ fun SegmentedListLayoutHost<*, *>.handleListStartRefresh(
     showContentLoadingWhenEmpty: Boolean = !internalRetryByAutoRefresh,
 ) {
     if (isLoadingMore()) {
-        loadMoreCompleted(true)
+        loadMoreCompleted(hasMore = true, appended = false)
     }
     if (isEmpty()) {
         if ((!isRefreshEnable) or showContentLoadingWhenEmpty && !isRefreshing()) {
@@ -53,9 +53,9 @@ fun <D, Key : Any> SegmentedListLayoutHost<D, Key>.handleListData(
 
     if (isLoadMoreEnable) {
         if (hasMore == null) {
-            loadMoreCompleted(list != null && paging.hasMore(list.size))
+            loadMoreCompleted(list != null && paging.hasMore(list.size), appended = !list.isNullOrEmpty())
         } else {
-            loadMoreCompleted(list != null && hasMore(list))
+            loadMoreCompleted(list != null && hasMore(list), appended = !list.isNullOrEmpty())
         }
     }
 
@@ -95,9 +95,9 @@ fun <D> SegmentedListLayoutHost<D, Int>.handleListData(
 
     if (isLoadMoreEnable) {
         if (hasMore == null) {
-            loadMoreCompleted(list != null && paging.hasMore(list.size))
+            loadMoreCompleted(list != null && paging.hasMore(list.size), appended = !list.isNullOrEmpty())
         } else {
-            loadMoreCompleted(list != null && hasMore(list))
+            loadMoreCompleted(list != null && hasMore(list), appended = !list.isNullOrEmpty())
         }
     }
 

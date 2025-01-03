@@ -72,7 +72,7 @@ fun <T> buildListLayoutHost(
         }
 
         override fun loadMoreFailed() {
-            loadMoreController?.loadFail()
+            loadMoreController?.loadFailed()
         }
 
         override fun isEmpty(): Boolean {

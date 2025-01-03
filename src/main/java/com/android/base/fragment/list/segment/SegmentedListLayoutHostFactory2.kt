@@ -60,8 +60,8 @@ fun <T, Key : Any> buildSegmentedListLayoutHost2(
             dataManager.addData(data)
         }
 
-        override fun loadMoreCompleted(hasMore: Boolean) {
-            refreshLoadMoreViewImpl.loadMoreCompleted(hasMore)
+        override fun loadMoreCompleted(hasMore: Boolean, appended: Boolean) {
+            refreshLoadMoreViewImpl.loadMoreCompleted(hasMore, appended)
         }
 
         override fun loadMoreFailed() {

@@ -75,12 +75,12 @@ fun <T, Key : Any> buildSegmentedListLayoutHost(
             listDataHost.addData(data)
         }
 
-        override fun loadMoreCompleted(hasMore: Boolean) {
-            loadMoreController?.loadCompleted(hasMore)
+        override fun loadMoreCompleted(hasMore: Boolean, appended: Boolean) {
+            loadMoreController?.loadCompleted(hasMore, appended)
         }
 
         override fun loadMoreFailed() {
-            loadMoreController?.loadFail()
+            loadMoreController?.loadFailed()
         }
 
         override fun isEmpty(): Boolean {

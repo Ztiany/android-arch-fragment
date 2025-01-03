@@ -1,7 +1,7 @@
 package com.android.base.fragment.ui
 
 /**
- * 对下拉刷新的抽象。
+ * An interface for a view that supports refresh.
  *
  * @author Ztiany
  */

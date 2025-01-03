@@ -29,9 +29,11 @@ abstract class LoadMoreControllerImpl implements LoadMoreController {
     private final OnRecyclerViewScrollBottomListener mOnRecyclerViewScrollBottomListener;
     private boolean mAutoHideWhenNoMore = false;
 
-    @LoadMode private int mLoadMode = LoadMoreConfig.getLoadMode();
+    @LoadMode
+    private int mLoadMode = LoadMoreConfig.getLoadMode();
 
-    @Direction private int mDirection = Direction.UP;
+    @Direction
+    private int mDirection = Direction.UP;
 
     public LoadMoreControllerImpl(boolean useScrollListener, OnRecyclerViewScrollBottomListener onRecyclerViewScrollBottomListener) {
         loadMoreCallMinimalTimeInterval = useScrollListener;
@@ -77,6 +79,18 @@ abstract class LoadMoreControllerImpl implements LoadMoreController {
         }
     }
 
+    public void onClickLoadMoreView() {
+        if (mLoadMode == LoadMode.AUTO_LOAD) {
+            if ((mCurrentStatus == STATUS_FAIL)) {
+                callLoadMore();
+            }
+        } else if (mLoadMode == LoadMode.CLICK_LOAD) {
+            if (mCurrentStatus == STATUS_PRE || mCurrentStatus == STATUS_FAIL) {
+                callLoadMore();
+            }
+        }
+    }
+
     @Override
     public void setMinLoadMoreInterval(long mixLoadMoreInterval) {
         mMixLoadMoreInterval = mixLoadMoreInterval;
@@ -100,16 +114,25 @@ abstract class LoadMoreControllerImpl implements LoadMoreController {
     }
 
     @Override
-    public void loadFail() {
+    public void loadFailed() {
         mCurrentStatus = STATUS_FAIL;
         showLoadMoreFailedState();
     }
 
     @Override
     public void loadCompleted(final boolean hasMore) {
+        loadCompleted(hasMore, false);
+    }
+
+    @Override
+    public void loadCompleted(final boolean hasMore, final boolean appended) {
         mHasMore = hasMore;
         mCurrentStatus = STATUS_COMPLETE;
-        showLoadMoreCompletedState(mHasMore);
+        // If the data is appended, the load more view will not be shown.
+        // So we don't need to refresh the load more view.
+        if (!appended) {
+            showLoadMoreCompletedState(mHasMore);
+        }
     }
 
     @Override
@@ -146,7 +169,7 @@ abstract class LoadMoreControllerImpl implements LoadMoreController {
     }
 
     @Override
-    public void setAutoHiddenWhenNoMore(boolean autoHiddenWhenNoMore) {
+    public void setAutoHideWhenNoMore(boolean autoHiddenWhenNoMore) {
         if (mAutoHideWhenNoMore == autoHiddenWhenNoMore) {
             return;
         }
@@ -207,22 +230,13 @@ abstract class LoadMoreControllerImpl implements LoadMoreController {
         showLoadingMoreState();
     }
 
-    public void onClickLoadMoreView() {
-        if (mLoadMode == LoadMode.AUTO_LOAD) {
-            //自动加载更多模式，只有错误才能点击
-            if ((mCurrentStatus == STATUS_FAIL)) {
-                callLoadMore();
-            }
-        }  /*点击加载更多模式，只有错误和准备状态才能点击*/ else if (mLoadMode == LoadMode.CLICK_LOAD) {
-            if (mCurrentStatus == STATUS_PRE || mCurrentStatus == STATUS_FAIL) {
-                callLoadMore();
-            }
-        }
-    }
-
     public boolean isAutoHideWhenNoMore() {
         return mAutoHideWhenNoMore;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Abstract methods
+    ///////////////////////////////////////////////////////////////////////////
 
     abstract void showClickLoadMoreState();
 
